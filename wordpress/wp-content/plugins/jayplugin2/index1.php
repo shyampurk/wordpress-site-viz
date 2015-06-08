@@ -1,22 +1,14 @@
 <?
 /*
-Plugin Name: Jay sql query
+Plugin Name: import posts
 Plugin URI: http://www.bharatbaba.com
-Description:  Jay sql query how to write
+Description:  Plugin to import all the posts. Just call this function: importPosts('all'); 
 Author: Jay Bharat/9844542127/jaybharatjay@gmail.com
-Version: 1.0/26-may-2015
+Version: 2.0/9-June-2015
 Author URI: http://www.bharatbaba.com
 */
 
-function jay_comments($howmany) {
-	
-  global $wpdb;
-  $request = "SELECT ID, comment_ID, comment_content, comment_author, comment_author_url, post_title FROM $wpdb->comments LEFT JOIN $wpdb->posts ON $wpdb->posts.ID=$wpdb->comments.comment_post_ID WHERE post_status IN ('publish','static') ";
-	$comments = $wpdb->get_results($request);
-	echo "<pre>";print_r($comments);echo "</pre>";
-}
-
-function jay_posts($howmany) {
+function importPosts($howmany) {
 
 	  global $wpdb;
     $query = "SELECT * FROM $wpdb->posts
