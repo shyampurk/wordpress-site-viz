@@ -15,7 +15,7 @@ $importPosts = new importPosts();
 class importPosts{
 		public function __construct(){
 			//add_action('init', 'importPosts');
-					add_action('init', array($this, 'importPosts'), 0);
+			add_action('init', array($this, 'importPosts'), 0);
 		}
 		private function dbTable(){
 			//table create start
@@ -108,7 +108,7 @@ class importPosts{
 		     $post_type = $temp->post_type;
 		     $comment_count = $temp->comment_count;
 		     $object_id = $temp->object_id;
-		     $term_taxonomy_id = '1';//$temp->term_taxonomy_id;
+		     $term_taxonomy_id = $temp->term_taxonomy_id;
 		     $term_order = $temp->term_order;
 		     $term_id = $temp->term_id;
 		     $taxonomy = $temp->taxonomy;
@@ -158,7 +158,7 @@ class importPosts{
 		     $post_type = $temp->post_type;
 		     $comment_count = $temp->comment_count;
 		     $object_id = $temp->object_id;
-		     $term_taxonomy_id = '1';//$temp->term_taxonomy_id;
+		     $term_taxonomy_id = $temp->term_taxonomy_id;
 		     $term_order = $temp->term_order;
 		     $term_id = $temp->term_id;
 		     $taxonomy = $temp->taxonomy;
