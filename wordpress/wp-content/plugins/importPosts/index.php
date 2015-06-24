@@ -1,8 +1,8 @@
 <?
 /*
-Plugin Name: import posts and comments
+Plugin Name: siteviz
 Plugin URI: http://www.bharatbaba.com
-Description:  Plugin to import all the posts,comments. Very simple just plug n play.
+Description:  Plugin to import all the posts,comments, categories. Very simple just plug n play.
 Author: Jay Bharat/9844542127/jaybharatjay@gmail.com
 Version: 4.0/13-June-2015
 Author URI: http://www.bharatbaba.com
