@@ -2,4 +2,5 @@ For Iport the post:
 1.Hi Please download and install the plugin: importPosts
 2.Plug n play fully automatic.
 3.Download in zip mode in your server, then unzip it inside wp-content/plugins
-4.Go to admin panel and and activate the plugin: siteviz
+4.Go to the admin panel and and activate the plugin: siteviz
+5.Now onwards it will automatically save all your posts, comments and categories in the db.
