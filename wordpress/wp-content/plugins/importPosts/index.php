@@ -4,7 +4,7 @@ Plugin Name: siteviz
 Plugin URI: http://www.bharatbaba.com
 Description:  Plugin to import all the posts,comments, categories. Very simple just plug n play.
 Author: Jay Bharat/9844542127/jaybharatjay@gmail.com
-Version: 4.0/13-June-2015
+Version: 5.0/31-July-2015
 Author URI: http://www.bharatbaba.com
 */
 
@@ -15,7 +15,7 @@ class importPostsComments{
 			//Hook for adding importPostsComments
 			add_action('init', array($this, 'importPosts'), 0);
 			add_action('init', array($this, 'importComments'), 0); 
-			
+			add_action('init', array($this, 'importSentiment'), 0); 
 			
 		}
 		private function dbTablePosts(){
@@ -48,34 +48,7 @@ class importPostsComments{
 
 
 
-		  /*
-			$sql = "CREATE TABLE IF NOT EXISTS $table_name (
-		  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
-		  `posts_ID` bigint(20) unsigned NOT NULL COMMENT 'FK',
-		  `post_author` bigint(20) unsigned NOT NULL DEFAULT '0',
-		  `post_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-		  `post_date_gmt` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-		  `post_content` longtext NOT NULL,
-		  `post_title` text NOT NULL,
-		  `post_status` varchar(20) NOT NULL DEFAULT 'publish',
-		  `post_name` varchar(200) NOT NULL DEFAULT '',
-		  `post_modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-		  `post_modified_gmt` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-		  `post_type` varchar(20) NOT NULL DEFAULT 'post',
-		  `comment_count` bigint(20) NOT NULL DEFAULT '0',
-		  `object_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'wp_term_relationships',
-		  `term_taxonomy_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'wp_term_relationships',
-		  `term_order` int(11) NOT NULL DEFAULT '0' COMMENT 'wp_term_relationships',
-		  `term_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'wp_term_taxonomy',
-		  `taxonomy` varchar(32) NOT NULL DEFAULT '''''' COMMENT 'wp_term_taxonomy',
-		  `description` longtext NOT NULL COMMENT 'wp_term_taxonomy',
-		  `count` bigint(20) NOT NULL DEFAULT '0' COMMENT 'wp_term_taxonomy',
-		  PRIMARY KEY (`id`),
-		  KEY `post_name` (`post_name`(191)),
-		  KEY `type_status_date` (`post_type`,`post_status`,`post_date`,`posts_ID`),
-		  KEY `post_author` (`post_author`)
-		  ) ENGINE=MyISAM $charset_collate AUTO_INCREMENT=1;";
-		  */
+		  
 
 
 		  //table create close
@@ -91,51 +64,7 @@ class importPostsComments{
 		    AND $wpdb->posts.post_type = 'post'
 		    ORDER BY $wpdb->posts.post_date ASC
 		    ";
-		    //echo "<br>Query=".$query;
-		    /*
-			
-			$query = "SELECT $wpdb->posts.ID,$wpdb->posts.post_author,$wpdb->posts.post_date,$wpdb->posts.post_date_gmt,$wpdb->posts.post_content,$wpdb->posts.post_title,$wpdb->posts.post_status,$wpdb->posts.post_name,$wpdb->posts.post_modified,$wpdb->posts.post_modified_gmt,$wpdb->posts.post_type,$wpdb->posts.comment_count,$wpdb->term_relationships.object_id,$wpdb->term_relationships.term_taxonomy_id AS term_taxonomy_id,$wpdb->term_taxonomy.term_taxonomy_id AS term_taxonomy_idb,$wpdb->term_relationships.term_order,$wpdb->term_taxonomy.term_id,$wpdb->term_taxonomy.taxonomy,$wpdb->term_taxonomy.description,$wpdb->term_taxonomy.count  FROM $wpdb->posts
-		    LEFT JOIN $wpdb->term_relationships ON
-		    ($wpdb->posts.ID = $wpdb->term_relationships.object_id)
-		    LEFT JOIN $wpdb->term_taxonomy ON
-		    ($wpdb->term_relationships.term_taxonomy_id = $wpdb->term_taxonomy.term_taxonomy_id)
-		    WHERE $wpdb->posts.post_status = 'publish'
-		    AND $wpdb->term_taxonomy.taxonomy = 'category'
-		    AND $wpdb->term_taxonomy.term_id = 1
-		    ORDER BY post_date ASC
-		    ";
-
-			----------------------------
-		    $query = "SELECT * FROM $wpdb->posts
-		    LEFT JOIN $wpdb->term_relationships ON
-		    ($wpdb->posts.ID = $wpdb->term_relationships.object_id)
-		    LEFT JOIN $wpdb->term_taxonomy ON
-		    ($wpdb->term_relationships.term_taxonomy_id = $wpdb->term_taxonomy.term_taxonomy_id)
-		    WHERE $wpdb->posts.post_status = 'publish'
-		    AND $wpdb->term_taxonomy.taxonomy = 'category'
-		    AND $wpdb->term_taxonomy.term_id = 1
-		    ORDER BY post_date ASC
-		    ";
-
-		    ----------------------
-
-
-			SELECT * FROM wp_posts
-		    LEFT JOIN wp_term_relationships ON
-		    (wp_posts.ID = wp_term_relationships.object_id)
-		    LEFT JOIN wp_term_taxonomy ON
-		    (wp_term_relationships.term_taxonomy_id = wp_term_taxonomy.term_taxonomy_id)
-		    WHERE wp_posts.post_status = 'publish'
-		    AND wp_term_taxonomy.taxonomy = 'category'
-		    AND wp_term_taxonomy.term_id = 1
-		    ORDER BY post_date ASC
-
-
-			-------------------------
-
-		    SELECT *  FROM `wp_posts` WHERE `post_status` LIKE 'publish' AND `post_type`='post'
-
-		    */
+		   
 			$results = $wpdb->get_results($query);
 			//print_r($results);
 			return $results;
@@ -340,7 +269,7 @@ class importPostsComments{
 		     $comment_date_gmt = $temp->comment_date_gmt;
 		     $comment_approved = $temp->comment_approved;
 		     //row data close
-		    //}//foreach close
+		    
 			global $wpdb;
 		     $wpdb->insert("viz_comments", array(
 		     "comment_id" => $comment_ID,
@@ -395,17 +324,41 @@ class importPostsComments{
 		  dbDelta( $sql );
 
 
-		  /*
-			SELECT wt.* FROM wp_posts p
- INNER JOIN wp_term_relationships r ON r.object_id=p.ID
- INNER JOIN wp_term_taxonomy t ON t.term_taxonomy_id = r.term_taxonomy_id
- INNER JOIN wp_terms wt on wt.term_id = t.term_id
-WHERE p.ID=75 AND t.taxonomy="category"
-		  */
+		
 
 
 		  //table create close
 		}//function dbTableCategories close
+		
+		private function dbTableSentiment(){
+			//table create start
+		    global $wpdb;
+		    $charset_collate = $wpdb->get_charset_collate();
+		    $table_name='viz_sentiment';
+		   $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+		  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'PK',
+		  
+		  `comment_id` bigint(20) unsigned NOT NULL COMMENT 'FK',
+		  
+		  `neg` varchar(256) NOT NULL DEFAULT '',
+		  `neutral` varchar(256) NOT NULL DEFAULT '',  
+		  `pos` varchar(256)  NOT NULL COMMENT '',
+		  `label` varchar(256)  NOT NULL COMMENT '',
+		  
+		  PRIMARY KEY (`id`)
+		  
+		  ) ENGINE=MyISAM $charset_collate AUTO_INCREMENT=1;";
+		  require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		  dbDelta( $sql );
+
+
+		
+
+
+		  //table create close
+		}//function dbTableCategories close
+		
+		
 
 		private function categoriesForPost($posts_id){
 			global $wpdb;
@@ -445,15 +398,109 @@ WHERE p.ID=$posts_id AND t.taxonomy='category'
 		     ));
 		     return true;
 		}//function categoriesForPost close
-
+		
+		public function importSentiment(){
+		
+		    $this->dbTableSentiment();
+		
+    		$results = $this->getWpComments();
+    		//print_r($results);
+    		
+    		if(count($results)){
+			 for($i = 0; $i < count($results); $i++){
+			  
+			    if($results[$i]->comment_approved=='1'){
+    		      $comment_content = $results[$i]->comment_content;
+    		      $comment_ID = $results[$i]->comment_ID;
+    		      
+    		      
+    		      
+    		      //curl start
+        	        //$post = "language=english&text='super awesome movie'" ;
+        	      
+        	        $post = "language=english&text=$comment_content" ;
+        
+        
+                    $headers = array();
+                    $headers[] = 'X-Mashape-Key: qMoASitCA6mshhjabj2hxCxq1iDYp1wZgKUjsnI2TgbAhvgJls';
+                    $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+                    $headers[] = 'Accept: application/json';
+                    
+                    
+                    $ch = curl_init();
+                    
+                    curl_setopt($ch, CURLOPT_URL, 'https://japerk-text-processing.p.mashape.com/sentiment/');
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                    //curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch,CURLOPT_POSTFIELDS, $post);
+                    curl_setopt($ch, CURLOPT_POST, 1);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                    
+                    $response = curl_exec($ch);
+                                                  
+                    //curl close
+                     $decode = json_decode($response,true);
+                    //print_r ($decode);
+                    $neg = $decode['probability']['neg'];
+                    $neutral = $decode['probability']['neutral'];
+                    $pos = $decode['probability']['pos'];
+                    $label = $decode['label'];
+    
+    		      
+    		      
+                    //start
+                    $trueFalseAddEdit = $this->addEditSentiment($comment_ID,$neg,$neutral,$pos,$label);
+                    //$results = $this->getViz_sentiment($comment_ID);
+        			 
+                    //close
+                }//if close $results[$i]->comment_approved
+		     }//for close
+		    }//if close  
+		}//function importSentiment close
+		
+		private function addEditSentiment($comment_ID,$neg,$neutral,$pos,$label){
+    		global $wpdb;
+    		
+		     $query = "SELECT COUNT(id) AS total FROM viz_sentiment
+		     WHERE comment_id = '".$comment_ID."' LIMIT 0,1
+		     ";
+		     $results = $wpdb->get_results($query);
+		     $duplicate = 0;
+		     $duplicate = $results[0]->total;
+		     //return $duplicate;
+		     if($duplicate>=1){ 
+    		      //update
+    		      //global $wpdb;
+    		      $table = "viz_sentiment";
+    		      $data_array = array(
+    		        'neg' => $neg, 
+    		        'neutral' => $neutral, 
+    		        'pos' => $pos, 
+    		        'label' => $label
+    		       );
+    		      $where = array('comment_id' => $comment_ID);
+    		      $wpdb->update( $table, $data_array, $where );
+    		      return true;
+    		      //update closedir
+             }//if close
+             else{
+                 //add start        		    
+        			//global $wpdb;
+        		     $wpdb->insert("viz_sentiment", array(
+        		     "comment_id" => $comment_ID,
+        		     'neg' => $neg, 
+        		     'neutral' => $neutral, 
+        		     'pos' => $pos, 
+        		     'label' => $label
+        		     ));
+        		     return true;
+                 //add close
+             }//else close
+             return false;
+		}//function addEditSentiment close
+		
 }//class close
 //code closed
-
-/*
-SELECT wt.* FROM wp_posts p
- INNER JOIN wp_term_relationships r ON r.object_id=p.ID
- INNER JOIN wp_term_taxonomy t ON t.term_taxonomy_id = r.term_taxonomy_id
- INNER JOIN wp_terms wt on wt.term_id = t.term_id
-WHERE p.ID=1 AND t.taxonomy="category"
-*/
 
