@@ -1,9 +1,7 @@
 <?php
-//print_r($_REQUEST);
-//require_once('index.php');
+//http://localhost/wordpress/wp-content/plugins/dashboard/getdata.php?action=get_product_serial_callback
 
 
-//@session_start();
 @ob_start();
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -13,55 +11,14 @@ ini_set('html_errors', 0);
 define('SHORTINIT', true);
 
 
-//require_once( ABSPATH . WPINC . '/index.php' );
-//require_once(dirname(__FILE__)."index.php");
-//require_once( "WP-ROOT-PATH/wp-config.php");
-//require_once(plugins_url('dashboard/index.php'));
-
-//echo 'Pul='.dirname(__FILE__);
-//require_once(plugins_url('dashboard/index1.php'));
-//echo( $wpdb );
-//global $wpdb;
-//echo 'wpdb2='.$wpdb.'<br>';
-
-/*$pluginpath = plugin_dir_path( __FILE__ );
-define('MY_AWESOME_PLUGIN_PATH', $pluginpath);
-include(MY_AWESOME_PLUGIN_PATH . 'test1.php');
-if( function_exists( 'my_output' ) ) {
-    my_output();
-}*/
-
-
 
 require_once('../../../wp-load.php');
 
 if($_REQUEST['action'] == 'get_product_serial_callback'){
-//require_once( '../plugins/dashboard//test1.php');
-//require_once(dirname(__FILE__)."test1.php");
-//include( plugin_dir_path( __FILE__ ) . 'dashboard/test1.php'); 
 
-
-
-
-//echo "akjgg";
-	//echo "I will give you the result";
-	
-	/*
-    	$data.="{".'"id":'.'"'.$id.'"'.",".'"first_name":'.'"'.$first_name.'"'.",".'"added_date":'.'"'.$added_date.'"'.",".'"created_date":'.'"'.$created_date.'"'.",".'"text_content":'.'"'.$text_content.'"'.",".'"media_name":'.'"'.$media_name.'"'.",".'"profile_image":'.'"'.$profileImg.'"'.",".'"type":'.'"'.$diaryType.'"'.",".'"mt":'.'"'.$mediaType.'"'."}".",";
-    	
-    	if(count($allDiaryContent) > 1){
-				$data=substr($data,0,-1); 
-			}
-	*/
-	
-	//$arr = array('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5);
-	//$data = json_encode($arr);
-
-	
-	
 	$data = getPosts();
-	$data='{'.'"records"'.':['.$data.']}';
-	die($data);
+	//$data='{'.'"records"'.':['.$data.']}';
+	//die($data);
 }else{
 	//echo "Please call me on proper way";
 	$output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
@@ -70,28 +27,18 @@ if($_REQUEST['action'] == 'get_product_serial_callback'){
 
 function getPosts(){
     global $wpdb;  
-    
-     /*echo $queryAllPosts = "SELECT $wpdb->posts.ID,$wpdb->posts.post_author,$wpdb->posts.post_date,$wpdb->posts.post_date_gmt,$wpdb->posts.post_content,$wpdb->posts.post_title,$wpdb->posts.post_status,$wpdb->posts.post_name,$wpdb->posts.post_modified,$wpdb->posts.post_modified_gmt,$wpdb->posts.post_type,$wpdb->posts.comment_count FROM $wpdb->posts 
-    WHERE $wpdb->posts.post_status = 'publish'
-    AND $wpdb->posts.post_type = 'post'
-    ORDER BY $wpdb->posts.post_date ASC
-    LIMIT 0,1
-    ";*/
-    
-    echo $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_content,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count FROM viz_posts 
+    $postsCommentsJson = '';
+    $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_content,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count FROM viz_posts 
     WHERE viz_posts.post_status = 'publish'
     AND viz_posts.post_type = 'post'
     ORDER BY viz_posts.post_date ASC
-    LIMIT 0,10
-    ";
     
+    ";
     $results = $wpdb->get_results($queryAllPosts);
-    //$data = json_encode($results);
-    //return $data;
-    $data = '';
-    //echo 'total='.count($results);
     if(count($results)>1){
+       $data = '';
         //echo "<pre>";print_r($results);echo "</pre>";
+
         foreach($results as $temp){
             $id = $temp->id;
             $pid = $temp->posts_ID;
@@ -106,71 +53,291 @@ function getPosts(){
             $post_modified_gmt = $temp->post_modified_gmt;
             $post_type = $temp->post_type;
             $comment_count = $temp->comment_count;
-            $data.="{".'"id":'.'"'.$id.'"'.",".'"pid":'.'"'.$pid.'"'.",".'"post_author":'.'"'.$post_author.'"'.",".'"post_date":'.'"'.$post_date.'"'.",".'"post_date_gmt":'.'"'.$post_date_gmt.'"'.",".'"post_content":'.'"'.$post_content.'"'.",".'"post_title":'.'"'.$post_title.'"'.",".'"post_status":'.'"'.$post_status.'"'.",".'"post_name":'.'"'.$post_name.'"'.",".'"post_modified":'.'"'.$post_modified.'"'.",".'"post_modified_gmt":'.'"'.$post_modified_gmt.'"'.",".'"post_type":'.'"'.$post_type.'"'.",".'"comment_count":'.'"'.$comment_count.'"'."}".",";
+            $post_content = cleanObject($post_content);
             
+            $temp3='';
             
-            //get Comments start
-            $queryAllComments = "SELECT viz_comments.comment_content,viz_comments.comment_author,viz_comments.comment_author_email,viz_comments.comment_date,viz_comments.comment_date_gmt,viz_comments.comment_approved FROM viz_comments 
-    WHERE viz_comments.comment_post_ID = $pid
-    ORDER BY viz_comments.comment_date ASC
-    LIMIT 0,1
-    ";
-            $results2 = $wpdb->get_results($queryAllComments);
-            echo "<pre>";print_r($results2);echo "</pre>";
+            $categories = getCategories($pid);
+            $temp3='';
+            if(count($categories)>=1){
+                
+                foreach($categories as $temp2){
+                    $temp3.=$temp2->name.',';
+                }
+                //f(count($categories)>=1){
+                //}
+                $temp3=substr($temp3,0,-1);
+            }
+            
+            $data.="{".
+                '"id":'. '"'.$id.'",'.
+                '"pid":'. '"'.$pid.'",'.
+                '"post_author":'. '"'.$post_author.'",'.
+                '"post_date":'. '"'.$post_date.'",'.
+                '"post_content":'. '"'.$post_content.'",'.
+                '"post_title":'. '"'.$post_title.'",'.
+                '"post_name":'. '"'.$post_name.'",'.
+                '"categories":'. '"'.$temp3.'",'.
+                '"commentsAndMeta":'. '{';
 
-    /*
-            $comment_ID = $temp->comment_ID;
-		     $comment_post_ID = $temp->;
-		     $comment_content = $temp->;
-		     $comment_author = $temp->;
-		     $comment_author_email = $temp->;
-		      = $temp->;
-		     $comment_date_gmt = $temp->;
-		     $comment_approved = $temp->;
-            //get Comments close
-            */
+            $commentsFoundForThisPost = false;
+            $commentsJson = '';
+            if($comment_count){
+                $comments = getComments($pid);
+                //echo "<pre>";print_r($comments);echo "</pre>";
+                if(count($comments)>1){
+                   $commentsFoundForThisPost = true;
+                   foreach($comments as $temp2){
+                     
+                       $comment_id = $temp2->comment_id;
+                       list($neg,$neutral,$pos,$label) = getSentiment($comment_id);
+                       $comment_content = $temp2->comment_content;
+                       $comment_author = $temp2->comment_author;
+                       $comment_author_email = $temp2->comment_author_email;
+                       $comment_date = $temp2->comment_date;
+                       $comment_date_gmt = $temp2->comment_date_gmt;
+                       $comment_approved = $temp2->comment_approved;
+                       $comment_content = cleanObject($comment_content);
+                       $commentsJson.= '{'.
+                           '"comment_content":'. '"'.$comment_content.'",'.
+                           '"comment_author":'. '"'.$comment_author.'",'.
+                           '"comment_author_email":'. '"'.$comment_author_email.'",'.
+                           '"comment_date":'. '"'.$comment_date.'",'.
+                           '"comment_date_gmt":'. '"'.$comment_date_gmt.'",'.
+                           '"comment_approved":'. '"'.$comment_approved.'",'.
+                           '"neg":'. '"'.$neg.'",'.
+                           '"neutral":'. '"'.$neutral.'",'.
+                           '"pos":'. '"'.$pos.'",'.
+                           '"label":'. '"'.$label.'"'.
+                        '},';
+                       
+                   }//foreach close 
+                }else if(count($comments)==1){
+                    $commentsFoundForThisPost = true;
+                    $comment_id = $comments[0]->comment_id;
+                    list($neg,$neutral,$pos,$label) = getSentiment($comment_id);
+                    $comment_content = $comments[0]->comment_content;
+                    $comment_author = $comments[0]->comment_author;
+                    $comment_author_email = $comments[0]->comment_author_email;
+                    $comment_date = $comments[0]->comment_date;
+                    $comment_date_gmt = $comments[0]->comment_date_gmt;
+                    $comment_approved = $comments[0]->comment_approved;
+                    $commentsJson= '{'.
+                           '"comment_content":'. '"'.$comment_content.'",'.
+                           '"comment_author":'. '"'.$comment_author.'",'.
+                           '"comment_author_email":'. '"'.$comment_author_email.'",'.
+                           '"comment_date":'. '"'.$comment_date.'",'.
+                           '"comment_date_gmt":'. '"'.$comment_date_gmt.'",'.
+                           '"comment_approved":'. '"'.$comment_approved.'",'.
+                           '"neg":'. '"'.$neg.'",'.
+                           '"neutral":'. '"'.$neutral.'",'.
+                           '"pos":'. '"'.$pos.'",'.
+                           '"label":'. '"'.$label.'"'.
+                           
+                        '}';
+                }
+                if(count($comments)>1){
+                    $commentsJson=substr($commentsJson,0,-1); 
+                }
+            }//if close
+           
+            if($commentsFoundForThisPost){
+                 $data.='"comment":'.'['.$commentsJson.']';
+            }
+            $data.='}'.
+            '},';
+            
             
             
             
         }//foreach close
-        /*(count($allDiaryContent) > 1){
-				$data=substr($data,0,-1); 
-			}*/
+        //echo "hi123";
         $data=substr($data,0,-1); 
-        return $data;
+        //$data='['.$data.']'; 
+        //die($data);
+        //$data='{'.'"records"'.':['.$data.']}';
+        $data='{'.'"result":'.'"Yes",'.'"records"'.':['.$data.']}';
+        //$data='{'.'"result":'.'"Yes",'.'"records"'.':'.$data.'}';
+       // $data='{'.'"records"'.':['.$data.']}';
+      
+        die($data);
+        //echo $data;
+        //die($data);
+       //$output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
+       //echo $output;
+
+      //$output = json_encode(array('result'=>'yesResult', 'text' => $data));
+      //echo $output;
     }else if(count($results)==1){
-            //echo "<pre>";print_r($results);echo "</pre>";
-            $id = $results[0]->id;
-            $pid = $results[0]->posts_ID;
-            $post_author = $results[0]->post_author;
-            $post_date = $results[0]->post_date;
-            $post_date_gmt = $results[0]->post_date_gmt;
-            $post_content = $results[0]->post_content;
-            $post_title = $results[0]->post_title;
-            $post_status = $results[0]->post_status;
-            $post_name = $results[0]->post_name;
-            $post_modified = $results[0]->post_modified;
-            $post_modified_gmt = $results[0]->post_modified_gmt;
-            $post_type = $results[0]->post_type;
-            $comment_count = $results[0 ]->comment_count;
-            $data.="{".'"id":'.'"'.$id.'"'.",".'"pid":'.'"'.$pid.'"'.",".'"post_author":'.'"'.$post_author.'"'.",".'"post_date":'.'"'.$post_date.'"'.",".'"post_date_gmt":'.'"'.$post_date_gmt.'"'.",".'"post_content":'.'"'.$post_content.'"'.",".'"post_title":'.'"'.$post_title.'"'.",".'"post_status":'.'"'.$post_status.'"'.",".'"post_name":'.'"'.$post_name.'"'.",".'"post_modified":'.'"'.$post_modified.'"'.",".'"post_modified_gmt":'.'"'.$post_modified_gmt.'"'.",".'"post_type":'.'"'.$post_type.'"'.",".'"comment_count":'.'"'.$comment_count.'"'."}";
-            return $data;
+        $data = '';
+        $id = $results[0]->id;
+        $pid = $results[0]->posts_ID;
+        $post_author = $results[0]->post_author;
+        $post_date = $results[0]->post_date;
+        $post_date_gmt = $results[0]->post_date_gmt;
+        $post_content = $results[0]->post_content;
+        $post_content = cleanObject($post_content);
+        $post_title = $results[0]->post_title;
+        $post_status = $results[0]->post_status;
+        $post_name = $results[0]->post_name;
+        $post_modified = $results[0]->post_modified;
+        $post_modified_gmt = $results[0]->post_modified_gmt;
+        $post_type = $results[0]->post_type;
+        $comment_count = $results[0]->comment_count;
+        
+        
+            $categories = getCategories($pid);
+            
+            $temp3='';
+            if(count($categories)>=1){
+                
+                foreach($categories as $temp2){
+                    $temp3.=$temp2->name.',';
+                }
+                //f(count($categories)>=1){
+                //}
+                $temp3=substr($temp3,0,-1);
+            }
+
+        
+        $data="{".
+            '"id":'. '"'.$id.'",'.
+            '"pid":'. '"'.$pid.'",'.
+            '"post_author":'. '"'.$post_author.'",'.
+            '"post_date":'. '"'.$post_date.'",'.
+            '"post_content":'. '"'.$post_content.'",'.
+            '"post_title":'. '"'.$post_title.'",'.
+            '"post_name":'. '"'.$post_name.'",'.
+            '"categories":'. '"'.$temp3.'",'.
+            '"commentsAndMeta":'. '{';
+
+            $commentsFoundForThisPost = false;
+            $commentsJson = '';
+            if($comment_count){
+                $comments = getComments($pid);
+                //echo "<pre>";print_r($comments);echo "</pre>";
+                if(count($comments)>1){
+                   $commentsFoundForThisPost = true;
+                   foreach($comments as $temp2){
+                       $comment_id = $temp2->comment_id;
+                       list($neg,$neutral,$pos,$label) = getSentiment($comment_id);
+
+                       $comment_content = $temp2->comment_content;
+                       $comment_content = cleanObject($comment_content);
+                       $comment_author = $temp2->comment_author;
+                       $comment_author_email = $temp2->comment_author_email;
+                       $comment_date = $temp2->comment_date;
+                       $comment_date_gmt = $temp2->comment_date_gmt;
+                       $comment_approved = $temp2->comment_approved;
+                       
+                       $commentsJson.= '{'.
+                           '"comment_content":'. '"'.$comment_content.'",'.
+                           '"comment_author":'. '"'.$comment_author.'",'.
+                           '"comment_author_email":'. '"'.$comment_author_email.'",'.
+                           '"comment_date":'. '"'.$comment_date.'",'.
+                           '"comment_date_gmt":'. '"'.$comment_date_gmt.'",'.
+                           '"comment_approved":'. '"'.$comment_approved.'",'.
+                           '"neg":'. '"'.$neg.'",'.
+                           '"neutral":'. '"'.$neutral.'",'.
+                           '"pos":'. '"'.$pos.'",'.
+                           '"label":'. '"'.$label.'"'.
+                        '},';
+                       
+                   }//foreach close 
+                }else if(count($comments)==1){
+                    $commentsFoundForThisPost = true;
+                    $comment_id = $comments[0]->comment_id;
+                    list($neg,$neutral,$pos,$label) = getSentiment($comment_id);
+
+                    $comment_content = $comments[0]->comment_content;
+                    $comment_author = $comments[0]->comment_author;
+                    $comment_author_email = $comments[0]->comment_author_email;
+                    $comment_date = $comments[0]->comment_date;
+                    $comment_date_gmt = $comments[0]->comment_date_gmt;
+                    $comment_approved = $comments[0]->comment_approved;
+                    $commentsJson= '{'.
+                           '"comment_content":'. '"'.$comment_content.'",'.
+                           '"comment_author":'. '"'.$comment_author.'",'.
+                           '"comment_author_email":'. '"'.$comment_author_email.'",'.
+                           '"comment_date":'. '"'.$comment_date.'",'.
+                           '"comment_date_gmt":'. '"'.$comment_date_gmt.'",'.
+                           '"comment_approved":'. '"'.$comment_approved.'",'.
+                           '"neg":'. '"'.$neg.'",'.
+                           '"neutral":'. '"'.$neutral.'",'.
+                           '"pos":'. '"'.$pos.'",'.
+                           '"label":'. '"'.$label.'"'.
+                           
+                        '}';
+                }
+                if(count($comments)>1){
+                    $commentsJson=substr($commentsJson,0,-1); 
+                }
+            }//if close
+           
+            if($commentsFoundForThisPost){
+                 $data.='"comment":'.'['.$commentsJson.']';
+            }
+            $data.='}'.
+            '}';        
+            //echo $data='['.$data.']'; 
+             $data='{'.'"result":'.'"Yes",'.'"records"'.':['.$data.']}';
+             die($data);
+            //echo $data;
     }else{
         $output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
         die($output);
     }
-    
+}
 
-	//print_r($results);
-	
-	//$arr = array('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5);
-	//$data = json_encode($arr);
+function getComments($pid){
+    global $wpdb;  
+    $queryAllComments = "SELECT
+     viz_comments.comment_id,  viz_comments.comment_content,viz_comments.comment_author,viz_comments.comment_author_email,viz_comments.comment_date,viz_comments.comment_date_gmt,viz_comments.comment_approved FROM viz_comments 
+WHERE 
+viz_comments.posts_ID = $pid
+AND viz_comments.comment_approved = '1'
+ORDER BY viz_comments.comment_date ASC
 
-	
-	
-	//echo "hi 123";
-	
-	//$arr = array('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5);
-	//echo $data = json_encode($arr);
+";
+    $results = $wpdb->get_results($queryAllComments);
+    return $results;
+}//get Comments close
+
+function cleanObject($object){
+    //$val = array("\n","\r");
+    $val = array("\r\n", "\n", "\r");
+    return $object = str_replace($val, "", $object);
+}
+
+function getCategories($pid){
+    global $wpdb;
+    $query = "SELECT
+    name FROM viz_categories WHERE post_id='".$pid."'";
+    $results = $wpdb->get_results($query);
+    //print_r($results);//die('12');
+    return $results;
+
+}
+
+function getSentiment($comment_id){
+    global $wpdb;
+    $query = "SELECT
+    neg,neutral,pos,label FROM viz_sentiment WHERE comment_id='".$comment_id."' LIMIT 0,1";
+    $results = $wpdb->get_results($query);
+    $neg = '';
+    $neutral = '';
+    $pos = '';
+    $label = '';
+    if(count($results)>=1){
+        $neg = $results[0]->neg;
+        $neutral = $results[0]->neutral;
+        $pos = $results[0]->pos;
+        $label = $results[0]->label;
+    }
+    return array($neg,$neutral,$pos,$label);
+    //print_r($results);//die('12');
+    //return array($arrBusiness,$arrMovie,$arrLiveperformaces,$totalSolrResult,$continue);
+    //list($arrBusiness,$arrMovie,$arrLiveperformaces,$totalSolrResult,$continue) = $this->solrHref($solrQuery);
+
 }
 ?>

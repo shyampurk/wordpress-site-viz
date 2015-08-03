@@ -64,20 +64,12 @@ class Read_all_data_ajax {
 
     public function drawAdminPage() {   
     global $wpdb;
-    //echo 'aa='.$wpdb->posts;
-    //echo '<br>bb='.$wpdb->get_results;
-    /*echo $queryAllPosts = "SELECT $wpdb->posts.ID,$wpdb->posts.post_author,$wpdb->posts.post_date,$wpdb->posts.post_date_gmt,$wpdb->posts.post_content,$wpdb->posts.post_title,$wpdb->posts.post_status,$wpdb->posts.post_name,$wpdb->posts.post_modified,$wpdb->posts.post_modified_gmt,$wpdb->posts.post_type,$wpdb->posts.comment_count FROM $wpdb->posts 
-    WHERE $wpdb->posts.post_status = 'publish'
-    AND $wpdb->posts.post_type = 'post'
-    ORDER BY $wpdb->posts.post_date ASC
-    ";
-*/
- 
+    
         ?>
         <div style="width:820px;">
             <h2>Siteviz ajax data</h2>
         </div>
-        
+        <div id='textAreaDiv'><textarea id="textareaId" rows="50" cols="80"></textarea></div>
         
         
         <!--js start by jay-->
@@ -102,7 +94,7 @@ class Read_all_data_ajax {
 	
 	
 	<script type="text/javascript">
-                jQuery(document).ready(function(){
+                jQuery(document).ready(function($){
                     //alert('Hello World!');
                     // url: "<?php echo admin_url('admin-ajax.php'); ?>",
 //https://codex.wordpress.org/Determining_Plugin_and_Content_Directories
@@ -112,50 +104,71 @@ class Read_all_data_ajax {
                                 type: 'GET', 
                                 url: "<?php echo plugins_url('dashboard/getdata.php'); ?>",
                                 //url: ajaxurl,
-                                dataType : "JSON",
+                                //dataType : "JSON",
+                                dataType : "text",
                                 data : {action: "get_product_serial_callback"},
-                                                                 //cache: false, 
-                                success: function(data){
-                                
-	                                if((data['result'] == 'errorCommon') && (data['message'] == 'Norecords')){
-										//$("#regEmailDiv").removeClass( "input-group" );
-										//$("#regEmailGlyphicon").hide();
-										textMsg = 'No data found';
-										alert(textMsg);return false;
-										$("#resultEmail").css("color","green");
-										$('#resultEmail').text(textMsg);
-										$("#resultEmail").addClass("clsPyType");
-									}else{
-	                                
-		                                //alert('data');
-		                                alert(data['result']);return false;
-		                                //alert('length='+(data.records.length));
-		                                if (data.records.length >= 1) {
-		                                
-		                                
-		                                
-		                                /*
+                                //dataType: "json",
+				async: false,
+				cache: false,
+                                //cache: false, 
+                                success: function(data){//alert(data);
+                                var json_obj = JSON.parse(data);
+                                //alert('length12='+(json_obj['records'].length));
+                                //alert(json_obj);
+                                    //alert(data.records.length);
+                                    //alert(data['result']);
+                                    //alert(data['message']);return false;
+                                    //$("#textareaId").html("");
+                                    $('#textareaId').val('');
+                                    if((data['result'] == 'errorCommon') && (data['text'] == 'Norecords')){
+                                        //alert('11');
+    									//$("#regEmailDiv").removeClass( "input-group" );
+    									//$("#regEmailGlyphicon").hide();
+    									textMsg = 'No data found';
+    									$('#textareaId').val(textMsg);
+    									//alert(textMsg);//return false;
+    									$("#textareaId").css("color","red");
+    									//$('#textareaId').text(textMsg);
+    									//$("#resultEmail").addClass("clsPyType");
+    								}else if(json_obj['result']=="Yes"){
+    								    //alert('length='+(json_obj['records'].length));
+    								    //$("#textareaId").html("");
+    								    $('#textareaId').val(data);
+    								    //if(data.records != undefined)
+    								    //alert(data['result']);
+                                        //alert(data);//return false;
+
+                                        //$('#textareaId').val(textMsg);return false;
+    	                                //alert('data');
+    	                                //alert(data['result']);return false;
+    	                                //alert('length='+(data['text']));
+    	                               // alert('length='+(data.records.length));
+    	                                if (json_obj.records.length >= 1) {
+    	                                //alert('length12='+(data['records'].length));
+    	                                
+    	                                
+    	                                /*
     		                                diary.js
     		                                
     		                                thtml+='<div class="clsMsgHdr" id="divMsgHdr">';
                                     thtml+='<div class="clsMsgHdr2" id="divMsgHdr2">';
-										if(profile_image == ""){
-											thtml+='<div><img src="../../images/profile2.png" width="63" class="clsDiaryCircle"></div>';
-										}else{
-											var profileImgPath = socketUrl+'/imagesDynamic/profileImages/'+profile_image;
-											thtml+='<div><img src="'+profileImgPath+'" width="63" class="clsDiaryCircle"></div>';
-										}                                     	
+    									if(profile_image == ""){
+    										thtml+='<div><img src="../../images/profile2.png" width="63" class="clsDiaryCircle"></div>';
+    									}else{
+    										var profileImgPath = socketUrl+'/imagesDynamic/profileImages/'+profile_image;
+    										thtml+='<div><img src="'+profileImgPath+'" width="63" class="clsDiaryCircle"></div>';
+    									}                                     	
                                         thtml+='<div class="clsHdr2Name">';
     	                                   	thtml+='<span class="clsPyTypeUprBold">'+first_name+'</span><br/>';
-	    	                                thtml+='<span class="clsPyType">'+added_date+' | 2 HRTS</span>';
+        	                                thtml+='<span class="clsPyType">'+added_date+' | 2 HRTS</span>';
                                          thtml+='</div>';
-		                                */
-			                                
-		                                }//if data close
-		                                //alert('Eureka');
-	                               }
-                                }//success close
-                            });
+    	                                */
+    		                                
+    	                                }//if data close
+    	                                //alert('Eureka');
+    	                           }
+                            }//success close
+                        });
                 });
         </script>
 	
