@@ -31,8 +31,8 @@ function getPosts(){
     $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_content,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count FROM viz_posts 
     WHERE viz_posts.post_status = 'publish'
     AND viz_posts.post_type = 'post'
-    ORDER BY viz_posts.post_date ASC
-    
+    ORDER BY viz_posts.post_date DESC
+    LIMIT 0,1
     ";
     $results = $wpdb->get_results($queryAllPosts);
     if(count($results)>1){
@@ -85,7 +85,7 @@ function getPosts(){
             if($comment_count){
                 $comments = getComments($pid);
                 //echo "<pre>";print_r($comments);echo "</pre>";
-                if(count($comments)>1){
+                if(count($comments)>=1){
                    $commentsFoundForThisPost = true;
                    foreach($comments as $temp2){
                      
