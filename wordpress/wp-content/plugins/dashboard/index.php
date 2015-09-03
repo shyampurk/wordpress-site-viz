@@ -24,7 +24,20 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Bangalore, KA  +9102110-1301  IND
  */
 
-//RumbleTalk
+
+//add_action('admin_menu', 'test_plugin_setup_menu');
+/*function test_plugin_setup_menu(){
+        //add_menu_page( 'Test Plugin Page', 'Test Plugin', 'manage_options', 'test-plugin', 'test_init' );
+        add_menu_page( 'Siteviz Page', 'Siteviz', 'manage_options', 'siteviz-plugin', 'test_init' );
+        
+}
+
+function test_init(){
+        //echo "<h1>Hello World!</h1>";
+        new read_all_data_ajax_pubnub();
+}*/
+
+
 class read_all_data_ajax_pubnub {
     protected $options;
     public function __construct() {
@@ -35,9 +48,12 @@ class read_all_data_ajax_pubnub {
         } else {
             add_shortcode('siteviz-ajax', array(&$this, "embed"));
         }
+        
+       // add_action('admin_menu', 'test_plugin_setup_menu');
+        
     }
     
-    public function adminMenu() {
+    public function adminMenu1() {
         add_options_page
                 (
                 "Siteviz Ajax", "Siteviz Ajax", "administrator", "siteviz-ajax", array
@@ -47,6 +63,20 @@ class read_all_data_ajax_pubnub {
                 )
         );
     }
+    
+    function adminMenu(){
+        //add_menu_page( 'Test Plugin Page', 'Test Plugin', 'manage_options', 'test-plugin', 'test_init' );
+        add_menu_page( 'Siteviz Page', 'Siteviz', 'manage_options', 'siteviz-plugin', array
+            (
+            &$this,
+            "drawAdminPage"
+                )
+ );
+        
+    }
+
+    
+    
     public function drawAdminPage() {   
     global $wpdb;
         ?>
