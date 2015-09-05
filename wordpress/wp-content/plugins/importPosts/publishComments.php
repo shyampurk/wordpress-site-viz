@@ -69,8 +69,8 @@ LIMIT 0,1
              $publish_result = $pubnub->publish('demojay',$data);
             
     }else{
-        $output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
-        die($output);
+        //$output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
+        //die($output);
     }
 }
 
