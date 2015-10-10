@@ -77,7 +77,7 @@ LIMIT 0,1
 function cleanObject($object){
     //$val = array("\n","\r");
     $val = array("\r\n", "\n", "\r");
-    return $object = str_replace($val, " ", $object);
+    return $object = str_replace($val, "<br>", $object);
 }
 
 function getCategories($pid){

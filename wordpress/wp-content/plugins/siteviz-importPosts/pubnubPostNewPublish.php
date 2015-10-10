@@ -8,12 +8,17 @@ $data = getPosts($pubnub,$whichPost);
 function getPosts($pubnub,$whichPost){
     global $wpdb;  
     $postsCommentsJson = '';
-    $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_content,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count FROM viz_posts 
+    /*$queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_content,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count FROM viz_posts 
     WHERE viz_posts.post_status = 'publish'
     AND viz_posts.post_type = 'post'
     AND  viz_posts.posts_ID=$whichPost
     ORDER BY viz_posts.post_date ASC
-   
+    ";*/
+    $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_content,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count ,wp_users.user_login  FROM viz_posts , wp_users
+    WHERE viz_posts.post_type = 'post'
+    AND  viz_posts.posts_ID=$whichPost
+    AND  wp_users.ID=viz_posts.post_author
+    ORDER BY viz_posts.post_date ASC
     ";
     $results = $wpdb->get_results($queryAllPosts);
     if(count($results)>=1){
@@ -34,10 +39,14 @@ function getPosts($pubnub,$whichPost){
             $comment_count = $temp->comment_count;
             $post_content = cleanObject($post_content);
             $post_content = addslashes($post_content);
+            
+            $user_login = $temp->user_login;
             $temp3='';
             
             $categories = getCategories($pid);
-            $temp3='';
+            
+            
+            
             if(count($categories)>=1){
                 
                 foreach($categories as $temp2){
@@ -50,16 +59,14 @@ function getPosts($pubnub,$whichPost){
             $data.="{".
                 '"id":'. '"'.$id.'",'.
                 '"pid":'. '"'.$pid.'",'.
+                '"post_status":'. '"'.$post_status.'",'.
                 '"post_author":'. '"'.$post_author.'",'.
+                '"user_login":'. '"'.$user_login.'",'.
                 '"post_date":'. '"'.$post_date.'",'.
-                '"post_content":'. '"'.$post_content.'",'.
                 '"post_title":'. '"'.$post_title.'",'.
+                '"post_content":'. '"'.$post_content.'",'.
                 '"post_name":'. '"'.$post_name.'",'.
                 '"categories":'. '"'.$temp3.'"';
-            
-            
-            
-            
         }//foreach close
         
         //$data=substr($data,0,-1); 

@@ -1,39 +1,90 @@
 <?
+/*
+Plugin Name: siteviz
+Plugin URI: http://www.bharatbaba.com
+Description:  Plugin to import all the posts,comments, categories. Very simple just plug n play.
+Author: Jay Bharat/9844542127/jaybharatjay@gmail.com
+Version: 5.0/31-July-2015
+Author URI: http://www.bharatbaba.com
+*/
 //new post or edit post
-//echo "<pre>";print_r($_POST);echo "</pre>";
+
 $importPosts = new importPostsComments();
 class importPostsComments{
-		public function __construct(){
+    public function __construct(){
+    /*
+        I am first POST=
+
+Array
+(
+)
+
+I am first GET=
+
+Array
+(
+    [action] => trashcomment
+    [c] => 45
+    [_wp_original_http_referer] => http://localhost/wordpress/wp-admin/edit-comments.php?ids=46
+    [_wpnonce] => 80325e9cfa
+)
+
+    */
+            //echo "I am first POST=<pre>";print_r($_POST);echo "</pre>";
+		    //echo "I am first GET=<pre>";print_r($_GET);echo "</pre>";
 			if(count($_POST)){
 			    $post_ID = '';
-			    
     			if(@$_POST['_wp_http_referer']){
         			if(strripos($_POST['_wp_http_referer'],"post-new")){
-        			    //add now in db
             			add_action('edit_post', array($this, 'addpostCumPubnubPost'), 0);
         			}
         			else if(strripos($_POST['_wp_http_referer'],"edit")){
-        			    //edit now in db
-        			    $post_ID = $_POST['post_ID'];
-        			    add_action('edit_post', array($this, 'editpostCumPubnubPost'), 0);
+        			    if($_POST['action'] == 'editpost'){
+        			        $post_ID = $_POST['post_ID'];
+                            add_action('edit_post', array($this, 'editpostCumPubnubPost'), 0);
+                        }else if($_POST['action'] == 'editedcomment'){
+                            add_action('edit_comment', array($this, 'commentEditAdminPubnub'), 0);
+                        }
         			}
     			}
     			else if(@$_POST['comment_post_ID'] != ""){
-    			    //comment triggered
-                    add_action('comment_post', array($this, 'giveMeCommentId'), 0);
+                    if(@$_POST['action'] == "edit-comment"){
+                        add_action('edit_comment', array($this, 'commentQuickEditAdminPubnub'), 0);
+                    }else if(@$_POST['action'] == "replyto-comment"){
+                        
+                       add_action('comment_post', array($this, 'giveMeCommentIdForReply'), 0); 
+                       
+                    }else{
+                        add_action('comment_post', array($this, 'giveMeCommentId'), 0);
+                    }
                 }
-			}//post close
+                else if(@$_POST['action'] == "inline-save"){
+                    //echo "I am inline save";
+    			    $post_ID = $_POST['post_ID'];
+    			    add_action('edit_post', array($this, 'editpostCumPubnubPost'), 0);
+                }
+                else if(@$_POST['action'] == "dim-comment"){
+                    add_action('transition_comment_status', array($this, 'commentAdminPubnub'), 0);
+                }
+                else if(@$_POST['action'] == "delete-comment"){
+                    add_action('trash_comment', array($this, 'trashCommentCumPubnubPost'), 0);
+                }
+
+			}
 			else if(@$_GET['action'] === "trash"){
 			    add_action('edit_post', array($this, 'deletepostCumPubnubPost'), 0);  
             }
+            else if(@$_GET['action'] === "trashcomment"){
+                add_action('trash_comment', array($this, 'trashinEditCommentCumPubnubPost'), 0);  
+            }
 		}
 		
-        public function giveMeCommentId() {
-             $this->dbTableComments();
-             $comment_post_ID = $_POST['comment_post_ID'];
-             $comment = $_POST['comment'];
-             global $wpdb;
-             $query = "SELECT comment_ID  
+		public function giveMeCommentIdForReply() {
+            $this->dbTableComments();
+            $comment_post_ID = $_POST['comment_post_ID'];
+            $comment = $_POST['content'];
+            global $wpdb;
+            $query = "SELECT comment_ID  
 			FROM $wpdb->comments 
 			WHERE comment_post_ID = '$comment_post_ID'
 			AND 
@@ -47,13 +98,106 @@ class importPostsComments{
 			$trueFalse = $this->importSentiment($comment_ID);
 			$this->pubnubPublishComments($comment_ID);
         }
+        public function giveMeCommentId() {
+            $this->dbTableComments();
+            $comment_post_ID = $_POST['comment_post_ID'];
+            $comment = $_POST['comment'];
+            global $wpdb;
+            $query = "SELECT comment_ID  
+			FROM $wpdb->comments 
+			WHERE comment_post_ID = '$comment_post_ID'
+			AND 
+            comment_content  = '$comment'
+			ORDER BY comment_ID DESC
+			LIMIT 0,1
+		    ";
+		   	    
+			$results = $wpdb->get_results($query,OBJECT);
+			$comment_ID = $results[0]->comment_ID;
+			$trueFalse = $this->editCommentsCumPubnunCommentPublish($comment_ID);
+			$trueFalse = $this->importSentiment($comment_ID);
+			
+			$query = "SELECT comment_count  FROM $wpdb->posts WHERE ID = '$comment_post_ID' LIMIT 0,1";
+            $results = $wpdb->get_results($query,OBJECT);
+			$comment_count = $results[0]->comment_count;
+			$trueFalse = $this->editPostViz($comment_count, $comment_post_ID);
+			
+			$this->pubnubPublishComments($comment_ID);
+        }
+        
+        private function editPostViz($comment_count, $comment_post_ID){
+		      global $wpdb;
+		      $table = "viz_posts";
+		      $data_array = array(
+		        'comment_count' => $comment_count
+		       );
+		      $where = array('posts_ID' => $comment_post_ID);
+		      $wpdb->update( $table, $data_array, $where );
+		      return true;
+        }
+        
+        public function commentAdminPubnub(){
+            
+             $ID = $_POST['id'];
+    	     $new = $_POST['new'];
+    	     if($new == 'approved'){
+        	     $new = 1;
+    	     }else{
+        	     $new = 0;
+    	     }
+             //update
+             global $wpdb;
+             $table = "viz_comments";
+             $data_array = array(
+		        'comment_approved' => $new		        
+		       );
+            $where = array('comment_id' => $ID);
+            $wpdb->update( $table, $data_array, $where );
+            $this->pubnubPublishComments($ID);
+        }
 		
+		
+		public function commentEditAdminPubnub(){
+    		$comment_id = $_POST['c'];
+    		//now get record for above id
+    		$results = $this->getWpComments($comment_id);
+    		
+    		if($results[0]->comment_post_ID != ''){
+		      $duplicate = $this->ifDuplicateComments($comment_id);
+		      if($duplicate){
+		       $this->updateComments($results);
+		      }else{
+		       $this->insertComments($results);
+		      }
+		      $trueFalse = $this->importSentiment($comment_id);
+              $this->pubnubPublishComments($comment_id);
+		    }//if close
+		}
+		
+		public function commentQuickEditAdminPubnub(){ 
+		    //echo "<pre>";print_r($_POST);echo "</pre>";
+		    //die('abc');
+    		$comment_id = $_POST['comment_ID'];
+    		//now get record for above id
+    		$results = $this->getWpComments($comment_id);
+    		//print_r($data);
+    		if($results[0]->comment_post_ID != ''){
+		      $duplicate = $this->ifDuplicateComments($comment_id);
+		      if($duplicate){
+		       $this->updateComments($results);
+		      }else{
+		       $this->insertComments($results);
+		      }
+		      $trueFalse = $this->importSentiment($comment_id);
+              $this->pubnubPublishComments($comment_id);
+		    }//if close
+		}
         
         public function addpostCumPubnubPost($post_ID){
             $this->dbTablePosts();
             $results = $this->getWpPosts($post_ID);            
             if($this->ifDuplicatePost($post_ID)){
-                $this->updatePost($results[0]);
+                $this->updatePost($results[0]); 
             }else{
                 $this->insertPost($results[0]);
             }
@@ -71,7 +215,9 @@ class importPostsComments{
 		public function editpostCumPubnubPost() {
 		    $this->dbTablePosts();
             $post_ID = $_POST['post_ID'];
-            $results = $this->getWpPosts($post_ID);            
+            
+            $results = $this->getWpPosts($post_ID); 
+                     
             if($this->ifDuplicatePost($post_ID)){
                 $this->updatePost($results[0]);
             }else{
@@ -79,7 +225,40 @@ class importPostsComments{
             }
             $this->pubnubPostEditPublish($post_ID);
         }
+        public function trashCommentCumPubnubPost(){
+            //trash the comment
+            /*if($_POST['id']==''){
+                $comment_ID = $_POST['id'];
+            }else{
+               $comment_ID = $_GET['c']; 
+            }*/
+            $comment_ID = $_POST['id'];
+            //print_r($_POST);
+            //print_r($_GET);
+            //die('cidd='.$comment_ID);
+            $this->trashComment($comment_ID);           
+            $this->pubnubCommentDeletePublish($comment_ID); 
+        }
+        public function trashinEditCommentCumPubnubPost(){
+            //trash the comment
+            /*if($_POST['id']==''){
+                $comment_ID = $_POST['id'];
+            }else{
+               $comment_ID = $_GET['c']; 
+            }*/
+            $comment_ID = $_GET['c'];
+            //print_r($_POST);
+            //print_r($_GET);
+            //die('cidd='.$comment_ID);
+            $this->trashComment($comment_ID);           
+            $this->pubnubCommentDeletePublish($comment_ID); 
+        }
         
+        private function trashComment($comment_ID){
+            global $wpdb;
+            $wpdb->delete( 'viz_comments', array( 'comment_id' => $comment_ID ) );
+    		return true;
+        }
         private function updatePost($temp){
 		     $ID = $temp->ID;
 		     $post_author = $temp->post_author;
@@ -163,16 +342,19 @@ class importPostsComments{
 		
 		private function getWpPosts($post_ID){
 			global $wpdb;
-            $query = "SELECT $wpdb->posts.ID,$wpdb->posts.post_author,$wpdb->posts.post_date,$wpdb->posts.post_date_gmt,$wpdb->posts.post_content,$wpdb->posts.post_title,$wpdb->posts.post_status,$wpdb->posts.post_name,$wpdb->posts.post_modified,$wpdb->posts.post_modified_gmt,$wpdb->posts.post_type,$wpdb->posts.comment_count FROM $wpdb->posts
-		    
+            /*$query = "SELECT $wpdb->posts.ID,$wpdb->posts.post_author,$wpdb->posts.post_date,$wpdb->posts.post_date_gmt,$wpdb->posts.post_content,$wpdb->posts.post_title,$wpdb->posts.post_status,$wpdb->posts.post_name,$wpdb->posts.post_modified,$wpdb->posts.post_modified_gmt,$wpdb->posts.post_type,$wpdb->posts.comment_count FROM $wpdb->posts
 		    WHERE $wpdb->posts.post_status = 'publish'
 		    AND $wpdb->posts.post_type = 'post'
 		    AND $wpdb->posts.ID = $post_ID
 		    LIMIT 0,1
+		    ";*/
+		    
+		    $query = "SELECT $wpdb->posts.ID,$wpdb->posts.post_author,$wpdb->posts.post_date,$wpdb->posts.post_date_gmt,$wpdb->posts.post_content,$wpdb->posts.post_title,$wpdb->posts.post_status,$wpdb->posts.post_name,$wpdb->posts.post_modified,$wpdb->posts.post_modified_gmt,$wpdb->posts.post_type,$wpdb->posts.comment_count FROM $wpdb->posts
+		    WHERE $wpdb->posts.post_type = 'post'
+		    AND $wpdb->posts.ID = $post_ID
+		    LIMIT 0,1
 		    ";
-		   
 			$results = $wpdb->get_results($query);
-			//print_r($results);
 			return $results;
 		}
 
@@ -283,14 +465,14 @@ class importPostsComments{
 
 		private function updateComments($temp){
 			 //row data start, class/array data to object
-		     $comment_ID = $temp->comment_ID;
-		     $comment_post_ID = $temp->comment_post_ID;
-		     $comment_content = $temp->comment_content;
-		     $comment_author = $temp->comment_author;
-		     $comment_author_email = $temp->comment_author_email;
-		     $comment_date = $temp->comment_date;
-		     $comment_date_gmt = $temp->comment_date_gmt;
-		     $comment_approved = $temp->comment_approved;
+		     $comment_ID = $temp[0]->comment_ID;
+		     $comment_post_ID = $temp[0]->comment_post_ID;
+		     $comment_content = $temp[0]->comment_content;
+		     $comment_author = $temp[0]->comment_author;
+		     $comment_author_email = $temp[0]->comment_author_email;
+		     $comment_date = $temp[0]->comment_date;
+		     $comment_date_gmt = $temp[0]->comment_date_gmt;
+		     $comment_approved = $temp[0]->comment_approved;
 		     
 		     //row data close
 		      //update
@@ -307,7 +489,6 @@ class importPostsComments{
 		       );
 		      $where = array('comment_id' => $comment_ID);
 		      $wpdb->update( $table, $data_array, $where );
-		      echo "<pre>";print_r($data_array);echo "</pre>";
 		      return true;
 		      //update close
 		}
@@ -315,7 +496,6 @@ class importPostsComments{
 
 		private function insertComments($temp){
 			 //row data start, class/array data to object
-			 //print_r($temp);
 		     $comment_ID = $temp[0]->comment_ID;
 		     $comment_post_ID = $temp[0]->comment_post_ID;
 		     $comment_content = $temp[0]->comment_content;
@@ -409,7 +589,7 @@ class importPostsComments{
 			global $wpdb;
 			$wpdb->query($qry);
 			//delete close
-            //echo "<pre>";print_r($resultsCategories);echo "</pre>";
+            
 			foreach($resultsCategories as $temp){
 			     $term_id = $temp->term_id;
 			     $post_id = $postID;
@@ -456,8 +636,7 @@ class importPostsComments{
                     $response = curl_exec($ch);
                                                   
                     //curl close
-                     $decode = json_decode($response,true);
-                    //print_r ($decode);
+                    $decode = json_decode($response,true);
                     $neg = $decode['probability']['neg'];
                     $neutral = $decode['probability']['neutral'];
                     $pos = $decode['probability']['pos'];
@@ -519,6 +698,7 @@ class importPostsComments{
 		
 		private function pubnubPostEditPublish($whichPost) {
 		    if(@$whichPost){
+		        
 		        include( plugin_dir_path( __FILE__ ) . 'pubnubPostEditPublish.php');
             }
 		   
@@ -535,6 +715,12 @@ class importPostsComments{
         private function pubnubPostDeletePublish($whichPost) {
 		    if(@$whichPost){
 		        include( plugin_dir_path( __FILE__ ) . 'pubnubPostDeletePublish.php');
+            }
+		   
+		}
+		private function pubnubCommentDeletePublish($whichComment) {
+		    if(@$whichComment){
+		        include( plugin_dir_path( __FILE__ ) . 'pubnubCommentDeletePublish.php');
             }
 		   
 		}

@@ -1,5 +1,41 @@
 <?php
+/*
+  Plugin Name: siteviz receive data 
+  Plugin URI: http://www.bharatbaba.com
+  Description: An advanced siteviz for seeing all comments-posts-categories by ajax.
+  Version: 1.0
+  Author: Bharatababa com
+  Author URI: http://www.bharatbaba.com
+  License: GPL2
 
+  Copyright 2014-2020 bharatbaba Ltd (email : jaybharatjay@gmail.com)
+
+  This program is free trial software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License, version 2, as
+  published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Bangalore, KA  +9102110-1301  IND
+ */
+
+
+//add_action('admin_menu', 'test_plugin_setup_menu');
+/*function test_plugin_setup_menu(){
+        //add_menu_page( 'Test Plugin Page', 'Test Plugin', 'manage_options', 'test-plugin', 'test_init' );
+        add_menu_page( 'Siteviz Page', 'Siteviz', 'manage_options', 'siteviz-plugin', 'test_init' );
+        
+}
+
+function test_init(){
+        //echo "<h1>Hello World!</h1>";
+        new read_all_data_ajax_pubnub();
+}*/
 
 
 class read_all_data_ajax_pubnub {
@@ -51,10 +87,10 @@ class read_all_data_ajax_pubnub {
         <div id='textAreaDiv'><textarea id="textareaId" rows="50" cols="80"></textarea></div>
         
         <script type="text/javascript">
-                jQuery(document).ready(function($){
+                jQuery(document).ready(function($){ 
                         jQuery.ajax({
                                     type: 'GET', 
-                                    url: "<?php echo plugins_url('dashboard/getdata.php'); ?>",
+                                    url: "<?php echo plugins_url('siteviz-dashboard/getdata-new.php'); ?>",
                                     
                                     //dataType : "JSON",
                                     dataType : "text",
@@ -104,7 +140,7 @@ var pubnub = PUBNUB({
     },
     error: function (error) {
       // Handle error here
-      alert('Error'+JSON.stringify(error));
+      //alert('Error'+JSON.stringify(error));
     }
  });
 </script>

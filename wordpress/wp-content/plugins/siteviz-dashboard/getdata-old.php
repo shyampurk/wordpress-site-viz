@@ -1,7 +1,5 @@
 <?php
 //http://localhost/wordpress/wp-content/plugins/dashboard/getdata.php?action=get_product_serial_callback
-
-
 @ob_start();
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -28,11 +26,16 @@ if($_REQUEST['action'] == 'get_product_serial_callback'){
 function getPosts(){
     global $wpdb;  
     $postsCommentsJson = '';
-    $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_content,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count FROM viz_posts 
+    /*$queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_content,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count FROM viz_posts 
     WHERE viz_posts.post_status = 'publish'
     AND viz_posts.post_type = 'post'
     ORDER BY viz_posts.post_date DESC
     LIMIT 0,1
+    ";*/
+    $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_content,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count FROM viz_posts 
+    WHERE viz_posts.post_status = 'publish'
+    AND viz_posts.post_type = 'post'
+    ORDER BY viz_posts.post_date DESC
     ";
     $results = $wpdb->get_results($queryAllPosts);
     if(count($results)>1){
@@ -82,7 +85,7 @@ function getPosts(){
 
             $commentsFoundForThisPost = false;
             $commentsJson = '';
-            if($comment_count){
+            if($comment_count){ 
                 $comments = getComments($pid);
                 //echo "<pre>";print_r($comments);echo "</pre>";
                 if(count($comments)>=1){
@@ -213,7 +216,7 @@ function getPosts(){
 
             $commentsFoundForThisPost = false;
             $commentsJson = '';
-            if($comment_count){
+            if($comment_count){ 
                 $comments = getComments($pid);
                 //echo "<pre>";print_r($comments);echo "</pre>";
                 if(count($comments)>1){
@@ -299,6 +302,7 @@ AND viz_comments.comment_approved = '1'
 ORDER BY viz_comments.comment_date ASC
 
 ";
+
     $results = $wpdb->get_results($queryAllComments);
     return $results;
 }//get Comments close
