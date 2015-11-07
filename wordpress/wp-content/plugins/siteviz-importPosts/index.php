@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 Plugin Name: siteviz
 Plugin URI: http://www.bharatbaba.com
