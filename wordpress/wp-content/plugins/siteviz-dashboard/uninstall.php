@@ -16,11 +16,13 @@ $table_name1='viz_sentiment';
 $table_name2='viz_categories';
 $table_name4='viz_posts';
 $table_name3='viz_comments';
+$table_name5='viz_tags';
 //$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}mytable" );
 $wpdb->query( "DROP TABLE IF EXISTS $table_name1" );
 $wpdb->query( "DROP TABLE IF EXISTS $table_name2" );
 $wpdb->query( "DROP TABLE IF EXISTS $table_name3" );
 $wpdb->query( "DROP TABLE IF EXISTS $table_name4" );
+$wpdb->query( "DROP TABLE IF EXISTS $table_name5" );
 
 //note in multisite looping through blogs to delete options on each blog does not scale. You'll just have to leave them.
 ?>

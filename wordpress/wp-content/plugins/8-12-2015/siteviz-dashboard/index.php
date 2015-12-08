@@ -1,9 +1,9 @@
 <?php
 /*
-  Plugin Name: siteviz integrated
+  Plugin Name: siteviz receive data 
   Plugin URI: http://www.bharatbaba.com
-  Description: An advanced siteviz for seeing all comments-posts-categories by push and pull technique.
-  Version: 2.0/8-Dec-2015
+  Description: An advanced siteviz for seeing all comments-posts-categories by ajax.
+  Version: 1.0
   Author: Bharatababa com
   Author URI: http://www.bharatbaba.com
   License: GPL2
@@ -149,5 +149,4 @@ var pubnub = PUBNUB({
 
 }//class close
 new read_all_data_ajax_pubnub();
-require_once('index2.php');
 ?>

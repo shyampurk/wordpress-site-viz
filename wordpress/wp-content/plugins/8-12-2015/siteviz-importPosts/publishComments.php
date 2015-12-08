@@ -26,6 +26,7 @@ LIMIT 0,1
             $commentsFoundForThisPost = false;
             if($comments){
                 $commentsFoundForThisPost = true;
+                $comment_post_id = $comments[0]->posts_id;
                 $comment_id = $comments[0]->comment_id;
                 list($neg,$neutral,$pos,$label) = getSentiment($comment_id);
 
@@ -37,6 +38,7 @@ LIMIT 0,1
                 $comment_date_gmt = $comments[0]->comment_date_gmt;
                 $comment_approved = $comments[0]->comment_approved;
                 $commentsJson= '{'.
+                       '"comment_post_id":'. '"'.$comment_post_id.'",'.
                        '"comment_content":'. '"'.$comment_content.'",'.
                        '"comment_author":'. '"'.$comment_author.'",'.
                        '"comment_author_email":'. '"'.$comment_author_email.'",'.
@@ -67,15 +69,15 @@ LIMIT 0,1
              $publish_result = $pubnub->publish('demojay',$data);
             
     }else{
-        $output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
-        die($output);
+        //$output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
+        //die($output);
     }
 }
 
 function cleanObject($object){
     //$val = array("\n","\r");
     $val = array("\r\n", "\n", "\r");
-    return $object = str_replace($val, " ", $object);
+    return $object = str_replace($val, "<br>", $object);
 }
 
 function getCategories($pid){
