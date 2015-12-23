@@ -1,18 +1,64 @@
 <?
+
+
 /*
-Plugin Name: siteviz
-Plugin URI: http://www.bharatbaba.com
-Description:  Plugin to import all the posts,comments, categories. Very simple just plug n play.
-Author: Jay Bharat/9844542127/jaybharatjay@gmail.com
-Version: 5.0/31-July-2015
-Author URI: http://www.bharatbaba.com
+	We are using 44 function in this page
+    This page is related: This page will act when any action happen for post and comments
+    This page will call: Automatically when any changes happen in post and comments
+    This page wil call manulaly by this way: No way
+    Functions are: 
+	class importPostsComments
+	1.public function __construct()
+	2.public function giveMeCommentIdForReply()
+	3.public function giveMeCommentId()
+	4.private function editPostViz($comment_count, $comment_post_ID)
+	5.public function commentAdminPubnub()
+	6.public function commentEditAdminPubnub()
+	7.public function commentQuickEditAdminPubnub()
+	8.public function addpostCumPubnubPost($post_ID)
+	9.public function draftpostCumPubnubPost
+	10.public function publishpostCumPubnubPost($post_ID)
+	11.public function deletepostCumPubnubPost($post_ID)
+	12.public function editpostCumPubnubPost()
+	13.public function trashCommentCumPubnubPost()
+	14.public function trashinEditCommentCumPubnubPost()
+	15.private function trashComment($comment_ID)
+	16.private function updatePost($temp)
+	17.private function deletePost($post_ID)
+	18.private function dbTablePosts()
+	19.private function getWpPosts($post_ID)
+	20.private function getWpDraftPosts($post_ID)
+	21.private function ifDuplicatePost($ID)
+	22.private function insertPost($temp)
+	23.private function dbTableComments()
+	24.private function getWpComments($comment_id)
+	25.private function ifDuplicateComments($comment_ID)
+	26.private function updateComments($temp)
+	27.private function insertComments($temp)
+	28.private function editCommentsCumPubnunCommentPublish($comment_id)
+	29.private function dbTableCategories()
+	30.private function dbTableTags()
+	31.private function dbTableSentiment()
+	32.private function categoriesForPost($posts_id)
+	33.private function tagsForPost($posts_id)
+	34.private function updateCategories($resultsCategories,$postID)
+	35.private function updateTags($resultsTags,$postID)
+	36.public function importSentiment($comment_ID)
+	37.private function addEditSentiment($comment_ID,$neg,$neutral,$pos,$label)
+	38.private function pubnubPostEditPublish($whichPost)
+	39.private function pubnubPostNewPublish($whichPost)
+	40.private function pubnubPostDraft($whichPost)
+	41.private function pubnubPostPublish($whichPost)
+	42.private function pubnubPostDeletePublish($whichPost)
+	43.private function pubnubCommentDeletePublish($whichComment)
+	44.private function pubnubPublishComments($whichComment)
 */
+
 //new post or edit post
 $importPosts = new importPostsComments();
 class importPostsComments{
     public function __construct(){
     
-            //echo "<pre>";print_r($_POST);echo "</pre>";
 			if(count($_POST)){
 			    $post_ID = '';
     			if(@$_POST['_wp_http_referer']){
@@ -42,12 +88,12 @@ class importPostsComments{
                         
                        add_action('comment_post', array($this, 'giveMeCommentIdForReply'), 0); 
                        
-                    }else{//africa
+                    }else{
                         add_action('comment_post', array($this, 'giveMeCommentId'), 0);
                     }
                 }
                 else if(@$_POST['action'] == "inline-save"){
-                    //echo "I am inline save";
+                    
     			    $post_ID = $_POST['post_ID'];
     			    add_action('edit_post', array($this, 'editpostCumPubnubPost'), 0);
                 }
@@ -86,6 +132,7 @@ class importPostsComments{
 			$trueFalse = $this->importSentiment($comment_ID);
 			$this->pubnubPublishComments($comment_ID);
         }
+		
         public function giveMeCommentId() {
             $this->dbTableComments();
             $comment_post_ID = $_POST['comment_post_ID'];
@@ -163,12 +210,9 @@ class importPostsComments{
 		}
 		
 		public function commentQuickEditAdminPubnub(){ 
-		    //echo "<pre>";print_r($_POST);echo "</pre>";
-		    //die('abc');
     		$comment_id = $_POST['comment_ID'];
     		//now get record for above id
     		$results = $this->getWpComments($comment_id);
-    		//print_r($data);
     		if($results[0]->comment_post_ID != ''){
 		      $duplicate = $this->ifDuplicateComments($comment_id);
 		      if($duplicate){
@@ -345,11 +389,7 @@ class importPostsComments{
 		
 		private function getWpPosts($post_ID){
 			global $wpdb;
-		    /*$query = "SELECT $wpdb->posts.ID,$wpdb->posts.post_author,$wpdb->posts.post_date,$wpdb->posts.post_date_gmt,$wpdb->posts.post_content,$wpdb->posts.post_title,$wpdb->posts.post_status,$wpdb->posts.post_name,$wpdb->posts.post_modified,$wpdb->posts.post_modified_gmt,$wpdb->posts.post_type,$wpdb->posts.comment_count FROM $wpdb->posts
-		    WHERE $wpdb->posts.post_type = 'post'
-		    AND $wpdb->posts.ID = $post_ID
-		    LIMIT 0,1
-		    ";*/
+		   
 		    $query = "SELECT $wpdb->posts.ID,$wpdb->posts.post_author,$wpdb->posts.post_date,$wpdb->posts.post_date_gmt,$wpdb->posts.post_title,$wpdb->posts.post_status,$wpdb->posts.post_name,$wpdb->posts.post_modified,$wpdb->posts.post_modified_gmt,$wpdb->posts.post_type,$wpdb->posts.comment_count FROM $wpdb->posts
 		    WHERE $wpdb->posts.post_type = 'post'
 		    AND $wpdb->posts.ID = $post_ID
@@ -448,9 +488,9 @@ class importPostsComments{
 		
 		private function dbTableComments(){
 			//table create start
-		    global $wpdb;
-		    $charset_collate = $wpdb->get_charset_collate();
-		    $table_name='viz_comments';
+		   global $wpdb;
+		   $charset_collate = $wpdb->get_charset_collate();
+		   $table_name='viz_comments';
 		   $sql = "CREATE TABLE IF NOT EXISTS $table_name (
 		  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'pk',
 		  `posts_id` bigint(20) unsigned NOT NULL,
@@ -574,7 +614,7 @@ class importPostsComments{
 		  require_once(ABSPATH . 'wp-admin/includes/upgrade.php' );
 		  dbDelta( $sql);
 		  //table create close
-		}//function dbTableCategories close
+		}
 		
 		
 		
@@ -594,7 +634,7 @@ class importPostsComments{
 		  require_once(ABSPATH . 'wp-admin/includes/upgrade.php' );
 		  dbDelta( $sql);
 		  //table create close
-		}//function dbTableCategories closedir 
+		} 
 		
 		
 		
@@ -615,7 +655,7 @@ class importPostsComments{
 		  require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		  dbDelta( $sql );
 		  //table create close
-		}//function dbTableSentiment close
+		}
 		
 		private function categoriesForPost($posts_id){
 			global $wpdb;
@@ -729,7 +769,6 @@ WHERE taxonomy = 'post_tag' AND object_id = $posts_id";
     		      
                     //start
                     $trueFalseAddEdit = $this->addEditSentiment($comment_ID,$neg,$neutral,$pos,$label);
-                    //$results = $this->getViz_sentiment($comment_ID);
         			 
                     //close
                 }//if close $results[$i]->comment_approved
@@ -832,18 +871,6 @@ WHERE taxonomy = 'post_tag' AND object_id = $posts_id";
             }
 		   
 		}
-
-		
-
-		
 }//class close
 //code closed
-
-
-
 require_once('init.php');
-
-
-
-
-

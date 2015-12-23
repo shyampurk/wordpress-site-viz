@@ -30,6 +30,23 @@ class common{
         $results = $wpdb->get_results($query);
         return $results;
 	}
+	function getSentiment($comment_id){
+        global $wpdb;
+        $query = "SELECT
+        neg,neutral,pos,label FROM viz_sentiment WHERE comment_id='".$comment_id."' LIMIT 0,1";
+        $results = $wpdb->get_results($query);
+        $neg = '';
+        $neutral = '';
+        $pos = '';
+        $label = '';
+        if(count($results)>=1){
+            $neg = $results[0]->neg;
+            $neutral = $results[0]->neutral;
+            $pos = $results[0]->pos;
+            $label = $results[0]->label;
+        }
+        return array($neg,$neutral,$pos,$label);
+    }
 
 }
 ?>

@@ -1,14 +1,35 @@
 <?php
+/*
+	We are using 7 function in this page
+    This page is related: It will fetch the particular post record from db it containts: posts,categories,tags,counts
+    This page will call: In pop method on if any post is added
+    This page will call automatically by this way: Through pop call via index2.php using pubnub api
+    This page wil call manulaly by this way: No way
+    Functions are: 
+	function getPosts($pubnub,$whichPost)
+	function cleanObject($object)
+	function getCategories($pid)
+	function getTags($pid)
+	function postCount($pid)
+
+*/
 //categories
 ini_set("display_errors", 1);
+require_once('classCommon.php');
+$common = new common();
 require_once('lib/autoloader.php');
 use Pubnub\Pubnub;
-$pubnub = new Pubnub('pub-c-3e92490d-3935-49d6-a2f1-f7f935f88036', 'sub-c-6c450ff2-3ae9-11e5-8579-02ee2ddab7fe');
-$data = getPosts($pubnub,$whichPost);
-function getPosts($pubnub,$whichPost){
+require_once('commonFunctions.php');
+$arraySettings = getSettings();
+$pubnub_subs_key = $arraySettings[0]->pubnub_subs_key;
+$pubnub_pub_key = $arraySettings[0]->pubnub_pub_key;
+$pubnub_chanel_name = $arraySettings[0]->pubnub_chanel_name;
+$pubnub = new Pubnub($pubnub_pub_key, $pubnub_subs_key);
+//$pubnub = new Pubnub('pub-c-3e92490d-3935-49d6-a2f1-f7f935f88036', 'sub-c-6c450ff2-3ae9-11e5-8579-02ee2ddab7fe');
+$data = getPosts($pubnub,$whichPost,$pubnub_chanel_name,$common);
+function getPosts($pubnub,$whichPost,$pubnub_chanel_name,$common){
     global $wpdb;  
     $postsCommentsJson = '';
-    
        
     $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,
     ".$wpdb->prefix."users.display_name,
@@ -44,7 +65,7 @@ viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_title,viz_posts.post_
             $user_login = $temp->user_login;
             $temp3='';
             
-            $categories = getCategories($pid);
+            $categories = $common->getCategories($pid);
             
             
             
@@ -59,7 +80,7 @@ viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_title,viz_posts.post_
             
             
             //tags start
-            $tags = getTags($pid);
+            $tags = $common->getTags($pid);
             $temp4='';
             if(count($tags)>=1){
                 
@@ -71,10 +92,8 @@ viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_title,viz_posts.post_
             //tags close
             
             //post count start
-            $postcount = postCount($pid);
-            //echo "pcount=<pre>";print_r($postcount);echo "</pre>";
+            $postcount = $common->postCount($pid);
             if(count($postcount)>=1){
-                //echo "pcount=<pre>";print_r($postcount);echo "</pre>";
                 $postcount = $postcount['0']->count_t;
             }else{
                 $postcount = 0;
@@ -98,22 +117,19 @@ viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_title,viz_posts.post_
                 '"categories":'. '"'.$temp3.'"';
         }//foreach close
         
-        //$data=substr($data,0,-1); 
-        
-        //$data='{'.'"result":'.'"Yes",'.'"records"'.':['.$data.'}]}';
         $data='{'.'"result":'.'"Yes",'.'"action":'.'"New",'.'"records"'.':['.$data.'}]}';
               
         //die($data);
-        $publish_result = $pubnub->publish('demojay',$data);
+        //$publish_result = $pubnub->publish('demojay',$data);
+        $publish_result = $pubnub->publish($pubnub_chanel_name,$data);
         
     }else{
-        //$output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
-        //die($output);
+        
     }
 }
 
 
-
+/*
 function cleanObject($object){
     //$val = array("\n","\r");
     $val = array("\r\n", "\n", "\r");
@@ -125,7 +141,6 @@ function getCategories($pid){
     $query = "SELECT
     name FROM viz_categories WHERE post_id='".$pid."'";
     $results = $wpdb->get_results($query);
-    //print_r($results);//die('12');
     return $results;
 
 }
@@ -144,5 +159,5 @@ function postCount($pid){
     count_t FROM viz_postcounts WHERE posts_id='".$pid."'";
     $results = $wpdb->get_results($query);
     return $results;
-}
+}*/
 ?>

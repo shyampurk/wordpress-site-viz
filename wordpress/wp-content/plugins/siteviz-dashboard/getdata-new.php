@@ -1,7 +1,49 @@
 <?php
-//http://localhost/wordpress/wp-content/plugins/dashboard/getdata.php?action=get_product_serial_callback
-
-
+/* We are using 7 function in this page
+    This page is related: It will fetch all the records from db it containts: posts,related comments,categories,tags,counts,sentiments
+    This page will call: In push method on page load and button click on Siteviz through admin pannel
+    This page will call automatically by this way: Through ajax via index.php
+    This page wil call manulaly by this way: No way
+    Functions are: 
+    1.getPosts()
+    2.getComments($pid)
+    3.cleanObject($object)
+    4.getCategories($pid)
+    5.getTags($pid)
+    6.postCount($pid)
+    7.getSentiment($comment_id)
+	Example data: 
+	{
+	"result": "Yes",
+	"records": [{
+		"id": "11",
+		"pid": "22",
+		"post_status": "publish",
+		"post_author_id": "1",
+		"post_author_name": "admin",
+		"post_date": "2015-12-10 04:14:47",
+		"post_count": "0",
+		"post_title": "ii3",
+		"post_name": "ii3",
+		"categories": "Uncategorized",
+		"tags": "",
+		"commentsAndMeta": {}
+	}, {
+		"id": "1",
+		"pid": "4",
+		"post_status": "publish",
+		"post_author_id": "1",
+		"post_author_name": "admin",
+		"post_date": "2015-11-17 11:52:38",
+		"post_count": "0",
+		"post_title": "aa",
+		"post_name": "aa",
+		"categories": "Uncategorized",
+		"tags": "",
+		"commentsAndMeta": {}
+	}]
+}
+*/
 @ob_start();
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -9,22 +51,14 @@ header('Access-Control-Max-Age: 604800');
 header('Access-Control-Allow-Headers: x-requested-with');
 ini_set('html_errors', 0);
 define('SHORTINIT', true);
-
-
-
 require_once('../../../wp-load.php');
-
 if($_REQUEST['action'] == 'get_product_serial_callback'){
-
 	$data = getPosts();
-	//$data='{'.'"records"'.':['.$data.']}';
-	//die($data);
 }else{
 	//echo "Please call me on proper way";
 	$output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
 	die($output);
 }
-
 function getPosts(){
     global $wpdb;  
     $postsCommentsJson = '';
@@ -34,13 +68,10 @@ viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_title,viz_posts.post_
     WHERE viz_posts.post_type = 'post'
 AND ".$wpdb->prefix."users.id = viz_posts.post_author
     ORDER BY viz_posts.post_modified_gmt DESC";
-    
     $results = $wpdb->get_results($queryAllPosts);
     if(count($results)>1){
        $data = '';
-        //echo "<pre>";print_r($results);echo "</pre>";
-
-        foreach($results as $temp){
+       foreach($results as $temp){
             $id = $temp->id;
             $pid = $temp->posts_ID;
             $post_author = $temp->post_author;
@@ -88,9 +119,7 @@ AND ".$wpdb->prefix."users.id = viz_posts.post_author
             
             //post count start
             $postcount = postCount($pid);
-            //echo "pcount=<pre>";print_r($postcount);echo "</pre>";
             if(count($postcount)>=1){
-                //echo "pcount=<pre>";print_r($postcount);echo "</pre>";
                 $postcount = $postcount['0']->count_t;
             }else{
                 $postcount = 0;
@@ -117,7 +146,6 @@ AND ".$wpdb->prefix."users.id = viz_posts.post_author
             $commentsJson = '';
             if($comment_count){
                 $comments = getComments($pid);
-                //echo "<pre>";print_r($comments);echo "</pre>";
                 if(count($comments)>1){
                    $commentsFoundForThisPost = true;
                    foreach($comments as $temp2){
@@ -190,17 +218,7 @@ AND ".$wpdb->prefix."users.id = viz_posts.post_author
         //die($data);
         //$data='{'.'"records"'.':['.$data.']}';
         $data='{'.'"result":'.'"Yes",'.'"records"'.':['.$data.']}';
-        //$data='{'.'"result":'.'"Yes",'.'"records"'.':'.$data.'}';
-       // $data='{'.'"records"'.':['.$data.']}';
-      
         die($data);
-        //echo $data;
-        //die($data);
-       //$output = json_encode(array('result'=>'errorCommon', 'text' => 'Norecords'));
-       //echo $output;
-
-      //$output = json_encode(array('result'=>'yesResult', 'text' => $data));
-      //echo $output;
     }else if(count($results)==1){
         $data = '';
         $id = $results[0]->id;
