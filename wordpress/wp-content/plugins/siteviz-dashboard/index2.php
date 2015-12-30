@@ -1,5 +1,12 @@
 <?
-
+/*
+Plugin Name: siteviz
+Plugin URI: http://www.bharatbaba.com
+Description:  Plugin to import all the posts,comments, categories. Very simple just plug n play.
+Author: Jay Bharat/9844542127/jaybharatjay@gmail.com
+Version: 5.0/31-July-2015
+Author URI: http://www.bharatbaba.com
+*/
 
 /*
 	We are using 44 function in this page
@@ -148,7 +155,7 @@ class importPostsComments{
 		    ";
 		   	    
 			$results = $wpdb->get_results($query,OBJECT);
-			$comment_ID = $results[0]->comment_ID;
+			$comment_ID = @$results[0]->comment_ID;
 			$trueFalse = $this->editCommentsCumPubnunCommentPublish($comment_ID);
 			$trueFalse = $this->importSentiment($comment_ID);
 			
@@ -731,6 +738,13 @@ WHERE taxonomy = 'post_tag' AND object_id = $posts_id";
 		
 		
 		public function importSentiment($comment_ID){
+		    global $wpdb;
+		    require_once('commonFunctions.php');
+		    $arraySettings = getSettings();
+            $mashape_Key = $arraySettings[0]->mashape_Key;
+            if(! $mashape_Key){
+                return false;
+            }
 		    $this->dbTableSentiment();
     		$results = $this->getWpComments($comment_ID);
     		if(count($results)){
@@ -743,7 +757,8 @@ WHERE taxonomy = 'post_tag' AND object_id = $posts_id";
         	        //$post = "language=english&text='super awesome movie'" ;
         	        $post = "language=english&text=$comment_content" ;
                     $headers = array();
-                    $headers[] = 'X-Mashape-Key: qMoASitCA6mshhjabj2hxCxq1iDYp1wZgKUjsnI2TgbAhvgJls';
+                    //$headers[] = 'X-Mashape-Key: qMoASitCA6mshhjabj2hxCxq1iDYp1wZgKUjsnI2TgbAhvgJls';
+                    $headers[] = "X-Mashape-Key: $mashape_Key";
                     $headers[] = 'Content-Type: application/x-www-form-urlencoded';
                     $headers[] = 'Accept: application/json';
                     $ch = curl_init();
@@ -777,7 +792,7 @@ WHERE taxonomy = 'post_tag' AND object_id = $posts_id";
 		}
 		
 		private function addEditSentiment($comment_ID,$neg,$neutral,$pos,$label){
-    		global $wpdb;
+    		 global $wpdb;
     		
 		     $query = "SELECT COUNT(id) AS total FROM viz_sentiment
 		     WHERE comment_id = '".$comment_ID."' LIMIT 0,1

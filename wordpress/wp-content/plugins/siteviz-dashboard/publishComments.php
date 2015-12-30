@@ -1,6 +1,6 @@
 <?php
 /*
-	We are using 4 function in this page
+	We are using 3 function in this page
     This page is related: It will save the particular comment id.
     This page will call: In pop method if any comment is added
     This page will call automatically by this way: Through pop call via index2.php using pubnub api
@@ -9,7 +9,7 @@
     Functions are: 
 	function getPosts($pubnub,$whichPost)
 	function cleanObject($object)
-	function getCategories($pid)
+	
 	function getSentiment($comment_id)
 */
 ini_set("display_errors", 1);
@@ -23,7 +23,7 @@ $pubnub_subs_key = $arraySettings[0]->pubnub_subs_key;
 $pubnub_pub_key = $arraySettings[0]->pubnub_pub_key;
 $pubnub_chanel_name = $arraySettings[0]->pubnub_chanel_name;
 $pubnub = new Pubnub($pubnub_pub_key, $pubnub_subs_key);
-//$pubnub = new Pubnub('pub-c-3e92490d-3935-49d6-a2f1-f7f935f88036', 'sub-c-6c450ff2-3ae9-11e5-8579-02ee2ddab7fe');
+
 $data = getPosts($pubnub,$whichComment,$pubnub_chanel_name,$common);
 function getPosts($pubnub,$whichComment,$pubnub_chanel_name,$common){
     global $wpdb;  
@@ -79,42 +79,8 @@ LIMIT 0,1
             $data.='}'.
             '}';        
              $data='{'.'"result":'.'"Yes",'.'"records"'.':['.$data.']}';
-             //$publish_result = $pubnub->publish('demojay',$data);
              $publish_result = $pubnub->publish($pubnub_chanel_name,$data);
     }else{
     }
 }
-
-/*function cleanObject($object){
-    //$val = array("\n","\r");
-    $val = array("\r\n", "\n", "\r");
-    return $object = str_replace($val, "<br>", $object);
-}
-
-function getCategories($pid){
-    global $wpdb;
-    $query = "SELECT
-    name FROM viz_categories WHERE post_id='".$pid."'";
-    $results = $wpdb->get_results($query);
-    return $results;
-
-}
-
-function getSentiment($comment_id){
-    global $wpdb;
-    $query = "SELECT
-    neg,neutral,pos,label FROM viz_sentiment WHERE comment_id='".$comment_id."' LIMIT 0,1";
-    $results = $wpdb->get_results($query);
-    $neg = '';
-    $neutral = '';
-    $pos = '';
-    $label = '';
-    if(count($results)>=1){
-        $neg = $results[0]->neg;
-        $neutral = $results[0]->neutral;
-        $pos = $results[0]->pos;
-        $label = $results[0]->label;
-    }
-    return array($neg,$neutral,$pos,$label);
-}*/
 ?>

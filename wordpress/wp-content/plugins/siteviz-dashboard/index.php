@@ -23,6 +23,8 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Bangalore, KA  +9102110-1301  IND
  */
+ 
+  
 require_once('commonFunctions.php');
 class read_all_data_ajax_pubnub {
     protected $options;
@@ -66,14 +68,17 @@ class read_all_data_ajax_pubnub {
             <h2>siteviz ajax data cum pubnub</h2>
         </div>
         <?php
+        
         //print_r($_POST); 
-        dbTableSettings();
+        dbCreateTableSettings();
         $arraySettings = getSettings();
         //echo "array2=<pre>";print_r($arraySettings);echo "</pre>";
-        if(@$arraySettings[0]->pubnub_subs_key !=''){
+        if((@$arraySettings[0]->pubnub_subs_key !='')||(@$arraySettings[0]->mashape_Key !='')){
             //edit  
             $text1 = "Edit";
-            editSettings($_POST);
+            if(@$_POST['pubnub_submt_key']){
+                editPubnubSettings($_POST);
+            }
             $arraySettings = getSettings();
             $pubnub_subs_key = $arraySettings[0]->pubnub_subs_key;
             $pubnub_pub_key = $arraySettings[0]->pubnub_pub_key;
@@ -85,11 +90,14 @@ class read_all_data_ajax_pubnub {
             $pubnub_subs_key = $_POST['pubnub_subs_key'];
             $pubnub_pub_key = $_POST['pubnub_pub_key'];
             $pubnub_chanel_name = $_POST['pubnub_chanel_name'];
-            addSettings($_POST);
+            if($_POST['pubnub_submt_key']){
+                addPubnubSettings($_POST);
+            }
         }
-               
+            
         ?>
-<div style="display: table;">
+<div class="table">
+<div class="bold">Pubnub key setting:</div>
 <form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">
         <div style="display: table-row;">
             <div style="display: table-cell;">Please enter subscribe key[<?php echo $text1; ?>]:</div>
@@ -103,6 +111,46 @@ class read_all_data_ajax_pubnub {
             <div style="display: table-cell;"><input type="text"  name="pubnub_chanel_name" value="<?php echo @$pubnub_chanel_name; ?>"/></div>
             
             <div style="display: table-cell;"><input type="submit" value="submit" name="pubnub_submt_key"></div>
+        </div>
+</form>
+</div>
+
+<?php
+       
+        $arraySettings = getSettings();
+        if((@$arraySettings[0]->mashape_Key !='')||(@$arraySettings[0]->pubnub_subs_key !='')){
+            //edit  
+            $text1 = "Edit";
+            if(@$_POST['mashape_submt_key']){
+                editMashapeSettings($_POST);
+            }
+            $arraySettings = getSettings();
+            $mashape_Key = $arraySettings[0]->mashape_Key;
+                        
+        }else{
+            //add
+            $text1 = "Add";
+            $mashape_Key = @$_POST['mashape_Key'];
+           
+            if(@$_POST['mashape_submt_key']){
+                addMashapeSettings($_POST);
+            }
+        }
+               
+        ?>
+
+<div class="table">
+<div class="bold">Mashape key setting:</div>
+<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">
+        <div style="display: table-row;">
+            <div style="display: table-cell;">Please enter Mashape-Key[<?php echo $text1; ?>]:</div>
+            <div style="display: table-cell;"><input type="text" size="58" name="mashape_Key" value="<?php echo @$mashape_Key; ?>"/></div>
+            
+        </div>
+        <div style="display: table-row;">
+            
+            <div style="display: table-cell;">&nbsp;</div>
+            <div style="display: table-cell;text-align: center;"><input type="submit" value="submit" name="mashape_submt_key" ></div>
         </div>
 </form>
 </div>
@@ -150,14 +198,20 @@ class read_all_data_ajax_pubnub {
         
         <!--pubnub ajax start-->
         <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+        <?php
+        $arraySettings = getSettings();
+        $pubnub_subs_key = $arraySettings[0]->pubnub_subs_key;
+        $pubnub_pub_key = $arraySettings[0]->pubnub_pub_key;
+        $pubnub_chanel_name = $arraySettings[0]->pubnub_chanel_name;
+        ?>
       <script type="text/javascript">  
 var pubnub = PUBNUB({
-    subscribe_key: 'sub-c-6c450ff2-3ae9-11e5-8579-02ee2ddab7fe', // always required
-    publish_key: 'pub-c-3e92490d-3935-49d6-a2f1-f7f935f88036'    // only required if publishing
+    subscribe_key: '<?php echo $pubnub_subs_key; ?>', // always required
+    publish_key: '<?php echo $pubnub_pub_key; ?>'    // only required if publishing
 });
 // Subscribe to a channel
  pubnub.subscribe({
-    channel: 'demojay',
+    channel: '<?php echo $pubnub_chanel_name; ?>',
     message: function(m){
         document.getElementById("textareaId").value =m; 
     },
@@ -167,8 +221,20 @@ var pubnub = PUBNUB({
     }
  });
 </script>
-<!--div id='textAreaDiv'><textarea id="textareaId" rows="50" cols="80"></textarea></div-->
-<div id="chatHistory">&nbsp;</div>
+<style type="text/css">
+.table{
+    display: table;border-style: solid;
+    border-width: 2px 2px 2px 2px;padding:3px;
+    }
+.bold{
+    font-size: 14px;
+    font-weight: bold;
+    font-family: verdana;
+    text-align: center;
+    }
+
+</style>
+
         <!-- pubnub ajax close-->
         <?php
     }//drawAdminPage close
@@ -187,4 +253,11 @@ var pubnub = PUBNUB({
 }//class close
 new read_all_data_ajax_pubnub();
 require_once('index2.php');
+/*
+    Please enter subscribe key[Edit]:sub-c-6c450ff2-3ae9-11e5-8579-02ee2ddab7fe
+    Please enter publish key:pub-c-3e92490d-3935-49d6-a2f1-f7f935f88036
+    Please enter channel name:demojay
+    Please enter Mashape-Key[Edit]:qMoASitCA6mshhjabj2hxCxq1iDYp1wZgKUjsnI2TgbAhvgJls
+*/
+
 ?>

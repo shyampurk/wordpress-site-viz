@@ -30,7 +30,8 @@ class common{
         $results = $wpdb->get_results($query);
         return $results;
 	}
-	function getSentiment($comment_id){
+	
+    function getSentiment($comment_id){
         global $wpdb;
         $query = "SELECT
         neg,neutral,pos,label FROM viz_sentiment WHERE comment_id='".$comment_id."' LIMIT 0,1";
@@ -47,6 +48,5 @@ class common{
         }
         return array($neg,$neutral,$pos,$label);
     }
-
 }
 ?>
