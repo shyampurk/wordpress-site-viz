@@ -80,7 +80,43 @@ LIMIT 0,1
             '}';        
              $data='{'.'"result":'.'"Yes",'.'"records"'.':['.$data.']}';
              $publish_result = $pubnub->publish($pubnub_chanel_name,$data);
+             
+             
+             //now calling a function for update total comment count in viz_posts
+             $result = updateCommentCount($comment_post_id);
+             
+             
     }else{
+    }
+}
+
+function updateCommentCount($comment_post_id){
+    //get total commennt for particular post
+    global $wpdb;  
+    $queryAllComments = "SELECT COUNT(id) AS total FROM `viz_comments` WHERE posts_id=$comment_post_id";
+    $comments = $wpdb->get_results($queryAllComments);
+    $total = 0;
+    if($comments){
+        $total = $comments[0]->total;
+    }
+    if($total){
+        //echo $total;
+        //update comment_count in viz_posts table
+        //update
+		  global $wpdb;   
+          $table = "viz_posts";
+          $data_array = array(
+            'comment_count' => $total            
+           );
+          $where = array('posts_ID' => $comment_post_id);
+          $wpdb->update( $table, $data_array, $where );
+          //print_r ($data_array);
+          //print_r ($where);
+          //echo $wpdb->last_query;
+          //echo $wpdb->last_result;
+          //echo $wpdb->last_error;
+          
+		      //update close
     }
 }
 ?>

@@ -62,7 +62,7 @@ if($_REQUEST['action'] == 'get_product_serial_callback'){
 function getPosts(){
     global $wpdb;  
     $postsCommentsJson = '';
-     $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,
+    $queryAllPosts = "SELECT viz_posts.id,viz_posts.posts_ID,viz_posts.post_author,
 ".$wpdb->prefix."users.display_name,
 viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_title,viz_posts.post_status,viz_posts.post_name,viz_posts.post_modified,viz_posts.post_modified_gmt,viz_posts.post_type,viz_posts.comment_count FROM viz_posts, ".$wpdb->prefix."users 
     WHERE viz_posts.post_type = 'post'

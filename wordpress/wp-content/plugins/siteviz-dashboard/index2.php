@@ -1,14 +1,5 @@
 <?
 /*
-Plugin Name: siteviz
-Plugin URI: http://www.bharatbaba.com
-Description:  Plugin to import all the posts,comments, categories. Very simple just plug n play.
-Author: Jay Bharat/9844542127/jaybharatjay@gmail.com
-Version: 5.0/31-July-2015
-Author URI: http://www.bharatbaba.com
-*/
-
-/*
 	We are using 44 function in this page
     This page is related: This page will act when any action happen for post and comments
     This page will call: Automatically when any changes happen in post and comments
