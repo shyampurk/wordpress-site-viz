@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 	We are using 44 function in this page
     This page is related: This page will act when any action happen for post and comments
