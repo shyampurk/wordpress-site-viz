@@ -98,7 +98,8 @@ class read_all_data_ajax_pubnub {
         ?>
 <div class="table">
 <div class="bold">Pubnub key setting:</div>
-<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">
+<?php /*<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">*/?>
+<form action="admin.php?page=siteviz-plugin" method="POST">
         <div style="display: table-row;">
             <div style="display: table-cell;">Please enter subscribe key[<?php echo $text1; ?>]:</div>
             <div style="display: table-cell;"><input type="text"  name="pubnub_subs_key" value="<?php echo @$pubnub_subs_key; ?>"/></div>
@@ -141,7 +142,8 @@ class read_all_data_ajax_pubnub {
 
 <div class="table">
 <div class="bold">Mashape key setting:</div>
-<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">
+<?php /*<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">*/?>
+<form action="admin.php?page=siteviz-plugin" method="POST">
         <div style="display: table-row;">
             <div style="display: table-cell;">Please enter Mashape-Key[<?php echo $text1; ?>]:</div>
             <div style="display: table-cell;"><input type="text" size="58" name="mashape_Key" value="<?php echo @$mashape_Key; ?>"/></div>
