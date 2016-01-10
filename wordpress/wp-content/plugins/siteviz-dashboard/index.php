@@ -31,7 +31,60 @@ class read_all_data_ajax_pubnub {
     public function __construct() {
         register_activation_hook(__FILE__, array(&$this, "install"));
         register_deactivation_hook(__FILE__, array(&$this, "unInstall"));
+        
         global $wpdb;
+        
+        //jay 10-jan-2016 start
+        // Add a new submenu under Settings:
+       
+    add_action('admin_menu', 'Siteviz');
+ 
+/*function Siteviz() {
+    add_submenu_page(
+        'tools.php',
+        'My Custom Submenu Page jay1',
+        'My Custom Submenu Page jay2',
+        'manage_options',
+        'my-custom-submenu-page',
+        'wpdocs_my_custom_submenu_page_callback' );
+}*/
+function Siteviz() {
+    add_submenu_page(
+        'options-general.php',
+        'Siteviz',
+        'Siteviz',
+        'manage_options',
+        'my-custom-submenu-page',
+        'Siteviz_callback' );
+}
+ 
+function Siteviz_callback() {
+    echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
+        echo '<h2>Siteviz settings</h2>';?>
+        <div class="table">
+<div class="bold">Pubnub key setting:</div>
+<?php /*<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">*/?>
+<form action="admin.php?page=siteviz-plugin" method="POST">
+        <div style="display: table-row;">
+            <div style="display: table-cell;">Please enter subscribe key[<?php echo $text1; ?>]:</div>
+            <div style="display: table-cell;"><input type="text"  name="pubnub_subs_key" value="<?php echo @$pubnub_subs_key; ?>"/></div>
+            <div style="display: table-cell;">Please enter publish key:</div>
+            <div style="display: table-cell;"><input type="text"  name="pubnub_pub_key" value="<?php echo @$pubnub_pub_key; ?>"/></div>
+
+        </div>
+        <div style="display: table-row;">
+            <div style="display: table-cell;">Please enter channel name:</div>
+            <div style="display: table-cell;"><input type="text"  name="pubnub_chanel_name" value="<?php echo @$pubnub_chanel_name; ?>"/></div>
+            
+            <div style="display: table-cell;"><input type="submit" value="submit" name="pubnub_submt_key"></div>
+        </div>
+</form>
+</div>
+    <?php echo '</div>';
+}
+        //jay 10-jan-2016 close
+        
+        
         if (is_admin()) {
              $adminMenu = 'adminMenu';
              add_action("admin_menu", array(&$this, $adminMenu));

@@ -299,7 +299,8 @@ class importPostsComments{
 		     $post_date_gmt = $temp->post_date_gmt;
 		     //$post_content = $temp->post_content;
 		     $post_title = $temp->post_title;
-		     $post_status = $temp->post_status;
+		     //$post_status = $temp->post_status;
+		     $post_status = 'modify';
 		     $post_name = $temp->post_name;
 		     $post_modified = $temp->post_modified;
 		     $post_modified_gmt = $temp->post_modified_gmt;
@@ -435,7 +436,8 @@ class importPostsComments{
 		     $post_date_gmt = $temp->post_date_gmt;
 		     //$post_content = $temp->post_content;
 		     $post_title = $temp->post_title;
-		     $post_status = $temp->post_status;
+		     //$post_status = $temp->post_status;
+		     $post_status = 'new';
 		     $post_name = $temp->post_name;
 		     $post_modified = $temp->post_modified;
 		     $post_modified_gmt = $temp->post_modified_gmt;
