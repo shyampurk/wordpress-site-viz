@@ -116,8 +116,8 @@ viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_title,viz_posts.post_
                 '"categories":'. '"'.$temp3.'"';
         }//foreach close
 		
-        $data='{'.'"result":'.'"Yes",'.'"action":'.'"Publish",'.'"records"'.':['.$data.'}]}';
-        
+        //$data='{'.'"result":'.'"Yes",'.'"action":'.'"Publish",'.'"records"'.':['.$data.'}]}';
+        $data='{'.'"result":'.'"Yes",'.'"action":'.'"Modify",'.'"records"'.':['.$data.'}]}';
         $publish_result = $pubnub->publish($pubnub_chanel_name,$data);
         
     }else{
