@@ -42,7 +42,8 @@
                      //row data start, class/array data to object
         		     $pubnub_subs_key = $post['pubnub_subs_key'];
                      $pubnub_pub_key = $post['pubnub_pub_key'];
-                     $pubnub_chanel_name = $post['pubnub_chanel_name'];		     
+                     //$pubnub_chanel_name = $post['pubnub_chanel_name'];	
+                     $pubnub_chanel_name = "demojay";	     
         		     //row data close
         		      //update
         		      global $wpdb;
@@ -119,4 +120,46 @@
 		   	$resultsTags = $wpdb->get_results($query);
 			return $resultsTags;
 		}
-?>
+		
+		function pubnubForm($text1='',$pubnub_subs_key='',$pubnub_pub_key=''){?>
+    		<div class="table">
+<div class="bold">Pubnub key setting:</div>
+<?php /*<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">*/?>
+<!--<form action="admin.php?page=siteviz-plugin" method="POST">-->
+<form action="options-general.php?page=my-custom-submenu-page" method="POST">
+        <div style="display: table-row;">
+            <div style="display: table-cell;">Please enter subscribe key[<?php echo $text1; ?>]:</div>
+            <div style="display: table-cell;"><input type="text"  name="pubnub_subs_key" value="<?php echo @$pubnub_subs_key; ?>"/></div>
+            <div style="display: table-cell;">Please enter publish key:</div>
+            <div style="display: table-cell;"><input type="text"  name="pubnub_pub_key" value="<?php echo @$pubnub_pub_key; ?>"/></div>
+
+        </div>
+        <!--<div style="display: table-row;">
+            <div style="display: table-cell;">Please enter channel name:</div>
+            <div style="display: table-cell;"><input type="text"  name="pubnub_chanel_name" value="<?php echo @$pubnub_chanel_name; ?>"/></div>-->
+            
+            <div style="display: table-cell;"><input type="submit" value="submit" name="pubnub_submt_key"></div>
+        </div>
+</form>
+</div>
+		<?php }
+		
+		function mashapeForm($text1='',$mashape_Key=''){?>
+		<div class="table">
+<div class="bold">Mashape key setting:</div>
+<?php /*<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">*/?>
+<!--<form action="admin.php?page=siteviz-plugin" method="POST">-->
+<form action="options-general.php?page=my-custom-submenu-page" method="POST">
+        <div style="display: table-row;">
+            <div style="display: table-cell;">Please enter Mashape-Key[<?php echo $text1; ?>]:</div>
+            <div style="display: table-cell;"><input type="text" size="58" name="mashape_Key" value="<?php echo @$mashape_Key; ?>"/></div>
+            
+        </div>
+        <div style="display: table-row;">
+            
+            <div style="display: table-cell;">&nbsp;</div>
+            <div style="display: table-cell;text-align: center;"><input type="submit" value="submit" name="mashape_submt_key" ></div>
+        </div>
+</form>
+</div>
+		<?php } ?>

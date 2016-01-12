@@ -3,7 +3,7 @@
   Plugin Name: siteviz integrated
   Plugin URI: http://www.bharatbaba.com
   Description: An advanced siteviz for seeing all comments-posts-categories by push and pull technique. Plugin to import all the posts,comments, categories. Very simple just plug n play.
-  Version: 1.0/23-Dec-2015
+  Version: 2.0/12-Jan-2016
   Author: Bharatababa com
   Author URI: http://www.bharatbaba.com
   License: GPL2
@@ -59,28 +59,61 @@ function Siteviz() {
 }
  
 function Siteviz_callback() {
-    echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
-        echo '<h2>Siteviz settings</h2>';?>
-        <div class="table">
-<div class="bold">Pubnub key setting:</div>
-<?php /*<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">*/?>
-<form action="admin.php?page=siteviz-plugin" method="POST">
-        <div style="display: table-row;">
-            <div style="display: table-cell;">Please enter subscribe key[<?php echo $text1; ?>]:</div>
-            <div style="display: table-cell;"><input type="text"  name="pubnub_subs_key" value="<?php echo @$pubnub_subs_key; ?>"/></div>
-            <div style="display: table-cell;">Please enter publish key:</div>
-            <div style="display: table-cell;"><input type="text"  name="pubnub_pub_key" value="<?php echo @$pubnub_pub_key; ?>"/></div>
-
-        </div>
-        <div style="display: table-row;">
-            <div style="display: table-cell;">Please enter channel name:</div>
-            <div style="display: table-cell;"><input type="text"  name="pubnub_chanel_name" value="<?php echo @$pubnub_chanel_name; ?>"/></div>
-            
-            <div style="display: table-cell;"><input type="submit" value="submit" name="pubnub_submt_key"></div>
-        </div>
-</form>
-</div>
-    <?php echo '</div>';
+    //echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
+        echo '<h2>Siteviz settings</h2>';
+         //print_r($_POST); 
+        dbCreateTableSettings();
+        $arraySettings = getSettings();
+        //echo "array2=<pre>";print_r($arraySettings);echo "</pre>";
+        if((@$arraySettings[0]->pubnub_subs_key !='')||(@$arraySettings[0]->mashape_Key !='')){
+            //edit  
+            $text1 = "Edit";
+            if(@$_POST['pubnub_submt_key']){
+                editPubnubSettings($_POST);
+            }
+            $arraySettings = getSettings();
+            $pubnub_subs_key = $arraySettings[0]->pubnub_subs_key;
+            $pubnub_pub_key = $arraySettings[0]->pubnub_pub_key;
+            //$pubnub_chanel_name = $arraySettings[0]->pubnub_chanel_name;
+            $pubnub_chanel_name = "demojay";
+        }else{
+            //add
+            $text1 = "Add";
+            $pubnub_subs_key = $_POST['pubnub_subs_key'];
+            $pubnub_pub_key = $_POST['pubnub_pub_key'];
+            //$pubnub_chanel_name = $_POST['pubnub_chanel_name'];
+            $pubnub_chanel_name = "demojay";
+            if($_POST['pubnub_submt_key']){
+                addPubnubSettings($_POST);
+            }
+        }
+         echo pubnubForm($text1,$pubnub_subs_key,$pubnub_pub_key); ?>
+         
+         
+         <?php
+       
+        $arraySettings = getSettings();
+        if((@$arraySettings[0]->mashape_Key !='')||(@$arraySettings[0]->pubnub_subs_key !='')){
+            //edit  
+            $text1 = "Edit";
+            if(@$_POST['mashape_submt_key']){
+                editMashapeSettings($_POST);
+            }
+            $arraySettings = getSettings();
+            $mashape_Key = $arraySettings[0]->mashape_Key;
+                        
+        }else{
+            //add
+            $text1 = "Add";
+            $mashape_Key = @$_POST['mashape_Key'];
+           
+            if(@$_POST['mashape_submt_key']){
+                addMashapeSettings($_POST);
+            }
+        }
+             echo mashapeForm($text1,$mashape_Key) ; 
+        ?>
+    <?php //echo '</div>';
 }
         //jay 10-jan-2016 close
         
@@ -117,98 +150,11 @@ function Siteviz_callback() {
     //add_settings_section( $id, $title, $callback, $page );
     do_settings_sections( 'myoption-group' );
         ?>
-        <div style="width:820px;">
-            <h2>siteviz ajax data cum pubnub</h2>
-        </div>
-        <?php
-        
-        //print_r($_POST); 
-        dbCreateTableSettings();
-        $arraySettings = getSettings();
-        //echo "array2=<pre>";print_r($arraySettings);echo "</pre>";
-        if((@$arraySettings[0]->pubnub_subs_key !='')||(@$arraySettings[0]->mashape_Key !='')){
-            //edit  
-            $text1 = "Edit";
-            if(@$_POST['pubnub_submt_key']){
-                editPubnubSettings($_POST);
-            }
-            $arraySettings = getSettings();
-            $pubnub_subs_key = $arraySettings[0]->pubnub_subs_key;
-            $pubnub_pub_key = $arraySettings[0]->pubnub_pub_key;
-            $pubnub_chanel_name = $arraySettings[0]->pubnub_chanel_name;
-            
-        }else{
-            //add
-            $text1 = "Add";
-            $pubnub_subs_key = $_POST['pubnub_subs_key'];
-            $pubnub_pub_key = $_POST['pubnub_pub_key'];
-            $pubnub_chanel_name = $_POST['pubnub_chanel_name'];
-            if($_POST['pubnub_submt_key']){
-                addPubnubSettings($_POST);
-            }
-        }
-            
-        ?>
-<div class="table">
-<div class="bold">Pubnub key setting:</div>
-<?php /*<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">*/?>
-<form action="admin.php?page=siteviz-plugin" method="POST">
-        <div style="display: table-row;">
-            <div style="display: table-cell;">Please enter subscribe key[<?php echo $text1; ?>]:</div>
-            <div style="display: table-cell;"><input type="text"  name="pubnub_subs_key" value="<?php echo @$pubnub_subs_key; ?>"/></div>
-            <div style="display: table-cell;">Please enter publish key:</div>
-            <div style="display: table-cell;"><input type="text"  name="pubnub_pub_key" value="<?php echo @$pubnub_pub_key; ?>"/></div>
-
-        </div>
-        <div style="display: table-row;">
-            <div style="display: table-cell;">Please enter channel name:</div>
-            <div style="display: table-cell;"><input type="text"  name="pubnub_chanel_name" value="<?php echo @$pubnub_chanel_name; ?>"/></div>
-            
-            <div style="display: table-cell;"><input type="submit" value="submit" name="pubnub_submt_key"></div>
-        </div>
-</form>
-</div>
-
-<?php
        
-        $arraySettings = getSettings();
-        if((@$arraySettings[0]->mashape_Key !='')||(@$arraySettings[0]->pubnub_subs_key !='')){
-            //edit  
-            $text1 = "Edit";
-            if(@$_POST['mashape_submt_key']){
-                editMashapeSettings($_POST);
-            }
-            $arraySettings = getSettings();
-            $mashape_Key = $arraySettings[0]->mashape_Key;
-                        
-        }else{
-            //add
-            $text1 = "Add";
-            $mashape_Key = @$_POST['mashape_Key'];
-           
-            if(@$_POST['mashape_submt_key']){
-                addMashapeSettings($_POST);
-            }
-        }
-               
-        ?>
 
-<div class="table">
-<div class="bold">Mashape key setting:</div>
-<?php /*<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">*/?>
-<form action="admin.php?page=siteviz-plugin" method="POST">
-        <div style="display: table-row;">
-            <div style="display: table-cell;">Please enter Mashape-Key[<?php echo $text1; ?>]:</div>
-            <div style="display: table-cell;"><input type="text" size="58" name="mashape_Key" value="<?php echo @$mashape_Key; ?>"/></div>
-            
-        </div>
-        <div style="display: table-row;">
-            
-            <div style="display: table-cell;">&nbsp;</div>
-            <div style="display: table-cell;text-align: center;"><input type="submit" value="submit" name="mashape_submt_key" ></div>
-        </div>
-</form>
-</div>
+
+
+
 
 
                 
