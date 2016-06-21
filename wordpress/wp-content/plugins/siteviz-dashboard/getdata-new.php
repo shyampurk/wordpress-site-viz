@@ -161,6 +161,7 @@ AND ".$wpdb->prefix."users.id = viz_posts.post_author
                        $comment_content = cleanObject($comment_content);
                        $commentsJson.= '{'.
                            '"comment_content":'. '"'.$comment_content.'",'.
+                           '"comment_id":'. '"'.$comment_id.'",'.
                            '"comment_author":'. '"'.$comment_author.'",'.
                            '"comment_author_email":'. '"'.$comment_author_email.'",'.
                            '"comment_date":'. '"'.$comment_date.'",'.
@@ -185,6 +186,7 @@ AND ".$wpdb->prefix."users.id = viz_posts.post_author
                     $comment_approved = $comments[0]->comment_approved;
                     $commentsJson= '{'.
                            '"comment_content":'. '"'.$comment_content.'",'.
+                           '"comment_id":'. '"'.$comment_id.'",'.
                            '"comment_author":'. '"'.$comment_author.'",'.
                            '"comment_author_email":'. '"'.$comment_author_email.'",'.
                            '"comment_date":'. '"'.$comment_date.'",'.
@@ -312,6 +314,7 @@ AND ".$wpdb->prefix."users.id = viz_posts.post_author
                        
                        $commentsJson.= '{'.
                            '"comment_content":'. '"'.$comment_content.'",'.
+                           '"comment_id":'. '"'.$comment_id.'",'.
                            '"comment_author":'. '"'.$comment_author.'",'.
                            '"comment_author_email":'. '"'.$comment_author_email.'",'.
                            '"comment_date":'. '"'.$comment_date.'",'.
@@ -337,6 +340,7 @@ AND ".$wpdb->prefix."users.id = viz_posts.post_author
                     $comment_approved = $comments[0]->comment_approved;
                     $commentsJson= '{'.
                            '"comment_content":'. '"'.$comment_content.'",'.
+                           '"comment_id":'. '"'.$comment_id.'",'.
                            '"comment_author":'. '"'.$comment_author.'",'.
                            '"comment_author_email":'. '"'.$comment_author_email.'",'.
                            '"comment_date":'. '"'.$comment_date.'",'.

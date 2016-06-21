@@ -119,7 +119,7 @@ viz_posts.post_date,viz_posts.post_date_gmt,viz_posts.post_title,viz_posts.post_
         }//foreach close
         
         //$data='{'.'"result":'.'"Yes",'.'"action":'.'"New",'.'"records"'.':['.$data.'}]}';
-        $data='{'.'"result":'.'"Yes",'.'"action":'.'"new",'.'"records"'.':['.$data.'}]}';
+        $data='{'.'"result":'.'"Yes",'.'"action":'.'"New",'.'"records"'.':['.$data.'}]}';
         $publish_result = $pubnub->publish($pubnub_chanel_name,$data);
     }else{
         

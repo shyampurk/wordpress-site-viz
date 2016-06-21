@@ -2,7 +2,9 @@
         function addPubnubSettings($post){
             //echo "inside=";print_r($post);
             // inside=Array ( [pubnub_subs_key] => a [pubnub_pub_key] => b [pubnub_chanel_name] => c [pubnub_submt_key] => submit ) 
+            //echo "Helo";
             if(@$post['pubnub_submt_key']=='submit'){
+                
                 //if(($post['pubnub_subs_key']!='')&&($post['pubnub_pub_key']!='')&&($post['pubnub_chanel_name']!='')){
         		     $pubnub_subs_key = $post['pubnub_subs_key'];
         		     $pubnub_pub_key = $post['pubnub_pub_key'];
@@ -10,11 +12,21 @@
         		     //row data close
 		    
                      global $wpdb;
+                     //print_r($wpdb);
+                     /*
         		     $wpdb->insert("viz_settings", array(
         		     "pubnub_subs_key" => $pubnub_subs_key,
         		     'pubnub_pub_key' => $pubnub_pub_key, 
         		     'pubnub_chanel_name' => $pubnub_chanel_name
         		     ));
+                     */
+                     $wpdb->insert("viz_settings", array(
+                     "pubnub_subs_key" => $pubnub_subs_key,
+                     'pubnub_pub_key' => $pubnub_pub_key, 
+                     'pubnub_chanel_name' => 'demo'
+                     ));
+
+                     //echo $wpdb->last_query;
         		     return true;
 
                 //}
@@ -43,7 +55,7 @@
         		     $pubnub_subs_key = $post['pubnub_subs_key'];
                      $pubnub_pub_key = $post['pubnub_pub_key'];
                      //$pubnub_chanel_name = $post['pubnub_chanel_name'];	
-                     $pubnub_chanel_name = "demojay";	     
+                     $pubnub_chanel_name = "demo";	     
         		     //row data close
         		      //update
         		      global $wpdb;
@@ -83,7 +95,10 @@
 
         function dbCreateTableSettings(){
 			//table create start
-		   global $wpdb;
+		   
+ 
+           global $wpdb;
+
 		   $charset_collate = $wpdb->get_charset_collate();
 		   $table_name='viz_settings';
 		   $sql = "CREATE TABLE IF NOT EXISTS $table_name (
@@ -95,7 +110,11 @@
 		  PRIMARY KEY (`id`)
 		  ) ENGINE=MyISAM $charset_collate AUTO_INCREMENT=1;";
 		  require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		  dbDelta( $sql );
+		  
+          
+
+          dbDelta( $sql );
+          
 		  //table create close
 		}
 		

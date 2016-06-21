@@ -49,6 +49,7 @@ LIMIT 0,1
                 list($neg,$neutral,$pos,$label) = $common->getSentiment($comment_id);
 
                 $comment_content = $comments[0]->comment_content;
+                $comment_id = $comments[0]->comment_id;
                 $comment_content = $common->cleanObject($comment_content);
                 $comment_author = $comments[0]->comment_author;
                 $comment_author_email = $comments[0]->comment_author_email;
@@ -57,6 +58,7 @@ LIMIT 0,1
                 $comment_approved = $comments[0]->comment_approved;
                 $commentsJson= '{'.
                        '"comment_post_id":'. '"'.$comment_post_id.'",'.
+                       '"comment_id":'. '"'.$comment_id.'",'.
                        '"comment_content":'. '"'.$comment_content.'",'.
                        '"comment_author":'. '"'.$comment_author.'",'.
                        '"comment_author_email":'. '"'.$comment_author_email.'",'.

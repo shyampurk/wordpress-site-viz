@@ -117,7 +117,7 @@ function getPosts($pubnub,$whichPost,$pubnub_chanel_name,$common){
         }//foreach close
         
         //$data='{'.'"result":'.'"Yes",'.'"action":'.'"Edit",'.'"records"'.':['.$data.'}]}';
-        $data='{'.'"result":'.'"Yes",'.'"action":'.'"modify",'.'"records"'.':['.$data.'}]}';
+        $data='{'.'"result":'.'"Yes",'.'"action":'.'"Modify",'.'"records"'.':['.$data.'}]}';
         $publish_result = $pubnub->publish($pubnub_chanel_name,$data);
         
     }else{

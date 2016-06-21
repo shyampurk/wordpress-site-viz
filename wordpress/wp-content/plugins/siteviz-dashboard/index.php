@@ -1,31 +1,18 @@
 <?php
 /*
-  Plugin Name: siteviz integrated
-  Plugin URI: http://www.bharatbaba.com
-  Description: An advanced siteviz for seeing all comments-posts-categories by push and pull technique. Plugin to import all the posts,comments, categories. Very simple just plug n play.
-  Version: 2.0/12-Jan-2016
-  Author: Bharatababa com
-  Author URI: http://www.bharatbaba.com
+  Plugin Name: SiteViz
+  Plugin URI: http://www.pubnub.com
+  Description: A plugin for visualizing the wordpress site structure in the form of categories
+  , posts and comments. Supports realtime visualization based on site activity.
+  Version: 1.0/21-June-2016
+  Author: PubNub
+  Author URI: http://www.pubnub.com
   License: GPL2
-
-  Copyright 2014-2020 bharatbaba Ltd (email : jaybharatjay@gmail.com)
-
-  This program is free trial software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License, version 2, as
-  published by the Free Software Foundation.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Bangalore, KA  +9102110-1301  IND
  */
  
   
 require_once('commonFunctions.php');
+define( 'MY_PLUGIN_PATH', plugin_dir_url( __FILE__ ) );
 class read_all_data_ajax_pubnub {
     protected $options;
     public function __construct() {
@@ -149,56 +136,103 @@ function Siteviz_callback() {
     global $wpdb;
     //add_settings_section( $id, $title, $callback, $page );
     do_settings_sections( 'myoption-group' );
+    wp_enqueue_script("siteviz" , plugin_dir_url(__FILE__) . "scripts/siteviz.js");
         ?>
        
 
+        <style>
+        .d3-tip {
+          line-height: 1;
+          font-weight: bold;
+          background: rgba(209, 73, 73, 0.8);
+          color: #fff;
+          border-radius: 2px;
+          
+          word-wrap: break-word;
+        }
+
+        .comment-wrap {
+            width : 400px;
+            word-wrap: break-word;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+          box-sizing: border-box;
+          display: inline;
+          font-size: 10px;
+          width: 100%;
+          line-height: 1;
+          color: rgba(209, 73, 173, 0.8);
+          content: "\25BC";
+          position: absolute;
+          text-align: center;
+
+        }
+
+        #vizHeaderDiv {
+            font-size: 1.5em;
+            padding-top: 10px;
+        }    
+
+        </style>
 
 
-
-
-
-                
-        <div id='textAreaDiv'><textarea id="textareaId" rows="50" cols="80"></textarea></div>
-        
+        <div>
+            <div id='vizHeaderDiv'><span><strong>Realtime Site Visualization</strong></span></div>        
+            <div id='vizAreaDiv'> </div>
+        </div>
         <script type="text/javascript">
+                var viz = null;
                 jQuery(document).ready(function($){ 
-                        jQuery.ajax({
+                
+                        loadAllPostData();
+                        
+                });
+
+                function loadAllPostData(){
+
+                    jQuery.ajax({
                                     type: 'GET', 
                                     url: "<?php echo plugins_url('siteviz-dashboard/getdata-new.php'); ?>",
                                     
                                     //dataType : "JSON",
-                                    dataType : "text",
+                                    //dataType : "text",
                                     data : {action: "get_product_serial_callback"},
-                                    //dataType: "json",
+                                    dataType: "json",
                                     async: false,
                                     cache: false,
                                     
                                     success: function(data){
                                         //var json_obj = JSON.parse(data);
                                    
-                                        $('#textareaId').val('');
+                                        
                                         if((data['result'] == 'errorCommon') && (data['text'] == 'Norecords')){
                                             
-        									textMsg = 'No data found';
-        									$('#textareaId').val(textMsg);
-        									
-        									$("#textareaId").css("color","red");
-        									
-        								}else {//if(json_obj['result']=="Yes"){
-        								    
-        								    $('#textareaId').val(data);
-        								    
-        	                                //if (json_obj.records.length >= 1) {}
-        	                                
-        	                           }
+                                            alert('No Posts Found');
+                                            
+
+
+                                            
+                                        }else {//if(json_obj['result']=="Yes"){
+                                            
+                                            //$('#textareaId').val(data);
+                                            
+                                            //if (json_obj.records.length >= 1) {}
+                                            viz = new VizElement(document.getElementById("vizAreaDiv"),data,"<?php echo MY_PLUGIN_PATH; ?>");
+
+                                       }
                                     }//success close
                             });
-                    });
+
+                }
         </script>
         
         
         <!--pubnub ajax start-->
         <script src="http://cdn.pubnub.com/pubnub.min.js"></script>
+        <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
         <?php
         $arraySettings = getSettings();
         $pubnub_subs_key = $arraySettings[0]->pubnub_subs_key;
@@ -214,7 +248,13 @@ var pubnub = PUBNUB({
  pubnub.subscribe({
     channel: '<?php echo $pubnub_chanel_name; ?>',
     message: function(m){
-        document.getElementById("textareaId").value =m; 
+        //document.getElementById("textareaId").value =m; 
+        if(viz){
+            viz.refresh(m);    
+        } else {
+            loadAllPostData();
+        }
+        
     },
     error: function (error) {
       // Handle error here
