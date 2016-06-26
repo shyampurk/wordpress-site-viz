@@ -1,6 +1,6 @@
 # Wordpress Site Visualization (SiteViz Plugin)
 
-This is a wordpress plugin which visualizes the site content stucture in the form of a force directed graph. Once installed, it can portray the categories , posts and comments added to the ste and can reveal the association between them to provide a bird's eye view to the administrator. 
+This is a wordpress plugin which visualizes the site content stucture in the form of a force directed graph. Once installed, it can portray the categories , posts and comments added to the site and can reveal the association between them to provide a bird's eye view to the administrator. 
 
 <img src='screenshot/screenshot.png'>
 
