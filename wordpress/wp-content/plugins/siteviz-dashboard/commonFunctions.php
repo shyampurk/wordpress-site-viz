@@ -1,4 +1,7 @@
 <?php
+/*
+ * Common functions for displaying & handling SiteViz Settings .
+ */
         function addPubnubSettings($post){
             //echo "inside=";print_r($post);
             // inside=Array ( [pubnub_subs_key] => a [pubnub_pub_key] => b [pubnub_chanel_name] => c [pubnub_submt_key] => submit ) 
@@ -12,18 +15,11 @@
         		     //row data close
 		    
                      global $wpdb;
-                     //print_r($wpdb);
-                     /*
-        		     $wpdb->insert("viz_settings", array(
-        		     "pubnub_subs_key" => $pubnub_subs_key,
-        		     'pubnub_pub_key' => $pubnub_pub_key, 
-        		     'pubnub_chanel_name' => $pubnub_chanel_name
-        		     ));
-                     */
+                     
                      $wpdb->insert("viz_settings", array(
                      "pubnub_subs_key" => $pubnub_subs_key,
                      'pubnub_pub_key' => $pubnub_pub_key, 
-                     'pubnub_chanel_name' => 'demo'
+                     'pubnub_chanel_name' => 'siteviz'
                      ));
 
                      //echo $wpdb->last_query;
@@ -54,8 +50,8 @@
                      //row data start, class/array data to object
         		     $pubnub_subs_key = $post['pubnub_subs_key'];
                      $pubnub_pub_key = $post['pubnub_pub_key'];
-                     //$pubnub_chanel_name = $post['pubnub_chanel_name'];	
-                     $pubnub_chanel_name = "demo";	     
+                     	
+                     $pubnub_chanel_name = "siteviz";	     
         		     //row data close
         		      //update
         		      global $wpdb;
@@ -118,20 +114,7 @@
 		  //table create close
 		}
 		
-		/*function getPubnubSettings(){
-    		global $wpdb;
-    		$table_name='viz_settings';
-		    $query = "SELECT pubnub_subs_key, pubnub_pub_key, pubnub_chanel_name  FROM ".$table_name;
-		   	$resultsTags = $wpdb->get_results($query);
-			return $resultsTags;
-		}
-		function getMashapeSettings(){
-    		global $wpdb;
-    		$table_name='viz_settings';
-		    $query = "SELECT mashape_Key  FROM ".$table_name;
-		   	$resultsTags = $wpdb->get_results($query);
-			return $resultsTags;
-		}*/
+		
 		function getSettings(){
     		global $wpdb;
     		$table_name='viz_settings';
@@ -142,22 +125,19 @@
 		
 		function pubnubForm($text1='',$pubnub_subs_key='',$pubnub_pub_key=''){?>
     		<div class="table">
-<div class="bold">Pubnub key setting:</div>
+<div class="bold">Pubnub Key Settings (www.pubnub.com) </div>
 <?php /*<form action="http://localhost/wordpress2/wp-admin/admin.php?page=siteviz-plugin" method="POST">*/?>
 <!--<form action="admin.php?page=siteviz-plugin" method="POST">-->
 <form action="options-general.php?page=my-custom-submenu-page" method="POST">
         <div style="display: table-row;">
-            <div style="display: table-cell;">Please enter subscribe key[<?php echo $text1; ?>]:</div>
+            <div style="display: table-cell;">Please Enter PubNub Subscribe Key : </div>
             <div style="display: table-cell;"><input type="text"  name="pubnub_subs_key" value="<?php echo @$pubnub_subs_key; ?>"/></div>
-            <div style="display: table-cell;">Please enter publish key:</div>
-            <div style="display: table-cell;"><input type="text"  name="pubnub_pub_key" value="<?php echo @$pubnub_pub_key; ?>"/></div>
-
         </div>
-        <!--<div style="display: table-row;">
-            <div style="display: table-cell;">Please enter channel name:</div>
-            <div style="display: table-cell;"><input type="text"  name="pubnub_chanel_name" value="<?php echo @$pubnub_chanel_name; ?>"/></div>-->
-            
-            <div style="display: table-cell;"><input type="submit" value="submit" name="pubnub_submt_key"></div>
+        <div style="display: table-row;">
+            <div style="display: table-cell;">Please Enter PubNub Publish Key : </div>
+            <div style="display: table-cell;"><input type="text"  name="pubnub_pub_key" value="<?php echo @$pubnub_pub_key; ?>"/></div>
+        </div>
+        <div style="display: table-cell;"><input type="submit" value="submit" name="pubnub_submt_key"></div>
         </div>
 </form>
 </div>

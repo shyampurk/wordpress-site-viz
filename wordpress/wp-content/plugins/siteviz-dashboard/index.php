@@ -2,8 +2,7 @@
 /*
   Plugin Name: SiteViz
   Plugin URI: http://www.pubnub.com
-  Description: A plugin for visualizing the wordpress site structure in the form of categories
-  , posts and comments. Supports realtime visualization based on site activity.
+  Description: A plugin for visualizing the wordpress site structure in the form of categories, posts and comments.
   Version: 1.0/21-June-2016
   Author: PubNub
   Author URI: http://www.pubnub.com
@@ -21,20 +20,11 @@ class read_all_data_ajax_pubnub {
         
         global $wpdb;
         
-        //jay 10-jan-2016 start
-        // Add a new submenu under Settings:
+        
        
     add_action('admin_menu', 'Siteviz');
  
-/*function Siteviz() {
-    add_submenu_page(
-        'tools.php',
-        'My Custom Submenu Page jay1',
-        'My Custom Submenu Page jay2',
-        'manage_options',
-        'my-custom-submenu-page',
-        'wpdocs_my_custom_submenu_page_callback' );
-}*/
+
 function Siteviz() {
     add_submenu_page(
         'options-general.php',
@@ -98,7 +88,8 @@ function Siteviz_callback() {
                 addMashapeSettings($_POST);
             }
         }
-             echo mashapeForm($text1,$mashape_Key) ; 
+            //Mashape API not implemented
+             //echo mashapeForm($text1,$mashape_Key) ; 
         ?>
     <?php //echo '</div>';
 }
@@ -294,11 +285,6 @@ var pubnub = PUBNUB({
 }//class close
 new read_all_data_ajax_pubnub();
 require_once('index2.php');
-/*
-    Please enter subscribe key[Edit]:sub-c-6c450ff2-3ae9-11e5-8579-02ee2ddab7fe
-    Please enter publish key:pub-c-3e92490d-3935-49d6-a2f1-f7f935f88036
-    Please enter channel name:demojay
-    Please enter Mashape-Key[Edit]:qMoASitCA6mshhjabj2hxCxq1iDYp1wZgKUjsnI2TgbAhvgJls
-*/
+
 
 ?>
