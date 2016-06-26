@@ -35,8 +35,8 @@ Follow the steps below to install and configure the plugin.
 ## Limitations
 1. This plugin will only display categories, posts and comments in the wordpress site along with their basis info. 
 2. This plugin cannot capture posts which were added before installing it.
-3. Realtime updates for comment and category deletion is not supported. 
-4. Any edit or trash operation through the bulk actions is not supported. 
+3. Realtime updates for comment and category deletion is not supported. Similarly, secondary means of performing operations through bulk actions or through dropdown menus is not supported.
+4. All times are in UTC.
 
 
 
